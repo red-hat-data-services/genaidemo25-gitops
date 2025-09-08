@@ -1,0 +1,7 @@
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-pipelines-operator-group
+  namespace: openshift-pipelines
+  labels:
+    app.kubernetes.io/managed-by: argocd
