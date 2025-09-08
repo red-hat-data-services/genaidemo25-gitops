@@ -12,7 +12,7 @@ spec:
   source:
     repoURL: https://github.com/red-hat-data-services/genaidemo25-gitops.git
     targetRevision: HEAD
-    path: shared-cluster/rhoai-setup/install-operator
+    path: shared-cluster/install-rhoai
   destination:
     server: https://kubernetes.default.svc
     namespace: redhat-ods-operator
@@ -21,8 +21,8 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-    - CreateNamespace=true
-    - PrunePropagationPolicy=foreground
-    - PruneLast=true
-    - RespectIgnoreDifferences=true
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+      - RespectIgnoreDifferences=true
   revisionHistoryLimit: 3

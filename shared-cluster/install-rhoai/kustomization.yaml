@@ -5,8 +5,7 @@ resources:
   # wave 0 define namespace
   - namespace.yaml
   # wave 1 prep
-  - rbac-presync-monitoring.yaml
   - subscription-authorino.yaml
-  # wave 2 install operator
+  # wave 2 install operator  
   - operator-group.yaml
-  - subscription.yaml
+  - subscription-rhoai.yaml

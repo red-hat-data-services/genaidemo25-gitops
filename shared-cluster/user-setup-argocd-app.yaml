@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: rhoai-operator
+  name: user-setup
   namespace: openshift-gitops
   labels:
     app.kubernetes.io/managed-by: argocd
@@ -11,11 +11,11 @@ spec:
   project: default
   source:
     repoURL: https://github.com/red-hat-data-services/genaidemo25-gitops.git
-    targetRevision: HEAD
-    path: shared-cluster/rhoai-setup/install-operator
+    targetRevision: shared-cluster-setup
+    path: shared-cluster/user-setup
   destination:
     server: https://kubernetes.default.svc
-    namespace: redhat-ods-operator
+    namespace: default
   syncPolicy:
     automated:
       prune: true
@@ -24,5 +24,4 @@ spec:
     - CreateNamespace=true
     - PrunePropagationPolicy=foreground
     - PruneLast=true
-    - RespectIgnoreDifferences=true
   revisionHistoryLimit: 3

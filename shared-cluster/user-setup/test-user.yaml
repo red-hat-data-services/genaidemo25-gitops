@@ -5,16 +5,17 @@ metadata:
   labels:
     app.kubernetes.io/managed-by: argocd
 identities:
-- htpasswd_provider:test-user
+- test-user:test-user
 fullName: Test User
 ---
 apiVersion: user.openshift.io/v1
 kind: Identity
 metadata:
-  name: htpasswd_provider:test-user
+  name: test-user:test-user
   labels:
     app.kubernetes.io/managed-by: argocd
-providerName: htpasswd_provider
+providerName: test-user
 providerUserName: test-user
 user:
   name: test-user
+  uid: bb0d4cb1-62ff-4113-b898-ad26d51b3456
