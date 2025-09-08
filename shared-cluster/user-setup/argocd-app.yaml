@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: user-setup
+  namespace: openshift-gitops
+  labels:
+    app.kubernetes.io/managed-by: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/red-hat-data-services/genaidemo25-gitops.git
+    targetRevision: shared-cluster-setup
+    path: shared-cluster/user-setup
+    # Exclude the ArgoCD Application itself to avoid self-reference
+    directory:
+      exclude: "argocd-app.yaml"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - PrunePropagationPolicy=foreground
+    - PruneLast=true
+  revisionHistoryLimit: 3

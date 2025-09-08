@@ -1,0 +1,20 @@
+apiVersion: user.openshift.io/v1
+kind: User
+metadata:
+  name: test-user
+  labels:
+    app.kubernetes.io/managed-by: argocd
+identities:
+- htpasswd_provider:test-user
+fullName: Test User
+---
+apiVersion: user.openshift.io/v1
+kind: Identity
+metadata:
+  name: htpasswd_provider:test-user
+  labels:
+    app.kubernetes.io/managed-by: argocd
+providerName: htpasswd_provider
+providerUserName: test-user
+user:
+  name: test-user
