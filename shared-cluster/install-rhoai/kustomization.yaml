@@ -2,8 +2,9 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  # wave 0 define namespace
+  # wave 0 define namespace and RBAC
   - namespace.yaml
+  - cluster-role-binding-dsc.yaml
   # wave 1 prep
   - subscription-authorino.yaml
   # wave 2 install operator  
