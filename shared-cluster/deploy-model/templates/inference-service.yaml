@@ -1,0 +1,40 @@
+# Create inference service
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: {{ .Values.inference.name }}
+  namespace: {{ .Values.namespace.name }}
+  annotations:
+    openshift.io/display-name: {{ .Values.inference.displayName }}
+    serving.knative.openshift.io/enablePassthrough: "true"
+    serving.kserve.io/deploymentMode: Serverless
+    sidecar.istio.io/inject: "true"
+    sidecar.istio.io/rewriteAppHTTPProbers: "true"
+  labels:
+    opendatahub.io/dashboard: "true"
+spec:
+  predictor:
+    automountServiceAccountToken: false
+    imagePullSecrets:
+    - name: {{ .Values.connection.name }}
+    maxReplicas: {{ .Values.inference.scaling.maxReplicas }}
+    minReplicas: {{ .Values.inference.scaling.minReplicas }}
+    model:
+      modelFormat:
+        name: {{ .Values.model.format }}
+      name: ""
+      resources:
+        limits:
+          cpu: {{ .Values.inference.resources.limits.cpu | quote }}
+          memory: {{ .Values.inference.resources.limits.memory }}
+          nvidia.com/gpu: {{ .Values.inference.resources.limits.gpu | quote }}
+        requests:
+          cpu: {{ .Values.inference.resources.requests.cpu | quote }}
+          memory: {{ .Values.inference.resources.requests.memory }}
+          nvidia.com/gpu: {{ .Values.inference.resources.requests.gpu | quote }}
+      runtime: {{ .Values.runtime.name }}
+      storageUri: {{ .Values.model.sourceUri }}
+    {{- if .Values.inference.tolerations }}
+    tolerations:
+    {{- toYaml .Values.inference.tolerations | nindent 4 }}
+    {{- end }}

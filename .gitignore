@@ -1,18 +1,14 @@
-# Sensitive files
-users.htpasswd
-*.htpasswd
+# Helm values with secrets
+shared-cluster/deploy-model/values.yaml
 
-# OS files
+# General ignores
 .DS_Store
-Thumbs.db
-
-# Editor files
-.vscode/
-.idea/
 *.swp
 *.swo
 *~
+.vscode/
+.idea/
 
 # Temporary files
 *.tmp
-*.temp
+*.bak

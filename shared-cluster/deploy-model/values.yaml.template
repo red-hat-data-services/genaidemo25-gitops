@@ -1,0 +1,92 @@
+# Model deployment configuration
+model:
+  # Model identifier - used for naming resources
+  name: "granite-3-3-2b"
+  # Display name for the model
+  displayName: "Granite 3.3 2B"
+  # Model source URI in OCI format
+  sourceUri: "oci://quay.io/redhat-ai-services/modelcar-catalog@sha256:b301bab15ab573fbdbb1f08f38b4307ccb1415f68597d55539e343b3f979a363"
+  # Model format for KServe
+  format: "vLLM"
+
+# Namespace configuration
+namespace:
+  # Name of the namespace to deploy into
+  name: "genai25-deployments"
+  # Display name for the namespace
+  displayName: "genai25-deployments"
+  # Description for the namespace
+  description: "Data Science Project for AI Model Deployment"
+
+# Model registry connection
+connection:
+  # Name of the connection secret
+  name: "model-connection"
+  # Display name for the connection
+  displayName: "Model Registry Connection"
+  # Description for the connection
+  description: "Connection secret for model registry access"
+  # Connection type
+  type: "oci-v1"
+  # Registry credentials (base64 encoded dockerconfigjson)
+  # Example: echo '{"auths":{"quay.io":{"auth":"<base64-encoded-username:token>","email":""}}}' | base64 -w 0
+  dockerConfigJson: "<BASE64_ENCODED_DOCKER_CONFIG_JSON>"
+  # Access type (base64 encoded)
+  accessType: "WyJQdWxsIl0="
+  # OCI host (base64 encoded)
+  # Example: echo "oci://quay.io/redhat-ai-services/modelcar-catalog@sha256:..." | base64 -w 0
+  ociHost: "<BASE64_ENCODED_OCI_HOST>"
+
+# Serving runtime configuration
+runtime:
+  # Name of the serving runtime
+  name: "vllm-runtime"
+  # Display name for the runtime
+  displayName: "vLLM NVIDIA GPU ServingRuntime"
+  # Runtime image
+  image: "quay.io/modh/vllm@sha256:56aa86c6ed6ba6cc9557a8583ff9d4ee535193f6cda030bd1268064bc70120e3"
+  # Runtime annotations
+  annotations:
+    acceleratorName: "migrated-gpu"
+    apiProtocol: "REST"
+    hardwareProfileName: "migrated-gpu-mglzi-serving"
+    recommendedAccelerators: '["nvidia.com/gpu"]'
+    runtimeVersion: "v0.9.1.0"
+    servingRuntimeScope: "global"
+    templateDisplayName: "vLLM NVIDIA GPU ServingRuntime for KServe"
+    templateName: "vllm-cuda-runtime"
+
+# Inference service configuration
+inference:
+  # Name of the inference service
+  name: "model-inference"
+  # Display name for the inference service
+  displayName: "Model Inference Service"
+  # Autoscaling configuration
+  scaling:
+    minReplicas: 1
+    maxReplicas: 1
+  # Resource requirements
+  resources:
+    requests:
+      cpu: "4"
+      memory: "8Gi"
+      gpu: "1"
+    limits:
+      cpu: "8"
+      memory: "10Gi"
+      gpu: "1"
+  # GPU tolerations
+  tolerations:
+    - effect: NoSchedule
+      key: nvidia.com/gpu
+      operator: Exists
+
+# Data Science Cluster configuration (if needed)
+dataScienceCluster:
+  # Whether to create/manage the DataScienceCluster
+  enabled: true
+  # Name of the DataScienceCluster
+  name: "default-dsc"
+
+# Chart configuration (ArgoCD sync waves removed for pure Helm deployment)

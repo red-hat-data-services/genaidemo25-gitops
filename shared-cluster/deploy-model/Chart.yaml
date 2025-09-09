@@ -1,0 +1,15 @@
+apiVersion: v2
+name: model-deployment
+description: GenAI Demo 2025 - Model Deployment
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+maintainers:
+  - name: RedHat Openshift AI Team
+    email: jsetina@redhat.com
+keywords:
+  - ai
+  - ml
+  - kserve
+  - rhoai
+  - inference
