@@ -9,3 +9,9 @@ resources:
   # wave 2 install operator  
   - operator-group.yaml
   - subscription-rhoai.yaml
+  # wave 3 service mesh and serverless prep
+  - subscription-servicemesh.yaml
+  - namespace-serverless.yaml
+  # wave 4 serverless operator
+  - operator-group-serverless.yaml
+  - subscription-serverless.yaml
