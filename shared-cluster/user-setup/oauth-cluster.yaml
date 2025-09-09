@@ -6,12 +6,12 @@ metadata:
     app.kubernetes.io/managed-by: argocd
 spec:
   identityProviders:
-  - name: hackathon
+  - name: admin-user
     mappingMethod: claim
     type: HTPasswd
     htpasswd:
       fileData:
-        name: htpass-secret-hackathon
+        name: htpass-secret-admin-user
   - name: test-user
     mappingMethod: claim
     type: HTPasswd

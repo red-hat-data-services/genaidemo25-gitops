@@ -24,4 +24,10 @@ spec:
     - CreateNamespace=true
     - PrunePropagationPolicy=foreground
     - PruneLast=true
+  ignoreDifferences:
+  - group: ""
+    kind: Secret
+    namespace: openshift-authentication
+    jsonPointers:
+    - /data
   revisionHistoryLimit: 3
