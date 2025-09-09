@@ -15,3 +15,5 @@ resources:
   # wave 4 serverless operator
   - operator-group-serverless.yaml
   - subscription-serverless.yaml
+  # wave 5 create data science cluster (creates KServe CRDs)
+  - data-science-cluster.yaml

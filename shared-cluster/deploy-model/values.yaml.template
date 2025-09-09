@@ -82,11 +82,7 @@ inference:
       key: nvidia.com/gpu
       operator: Exists
 
-# Data Science Cluster configuration (if needed)
-dataScienceCluster:
-  # Whether to create/manage the DataScienceCluster
-  enabled: true
-  # Name of the DataScienceCluster
-  name: "default-dsc"
+# Data Science Cluster is now managed by install-rhoai ArgoCD app
+# No configuration needed here - DSC is infrastructure, not model-specific
 
 # Chart configuration (ArgoCD sync waves removed for pure Helm deployment)
