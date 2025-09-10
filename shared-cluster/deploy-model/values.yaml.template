@@ -18,25 +18,6 @@ namespace:
   # Description for the namespace
   description: "Data Science Project for AI Model Deployment"
 
-# Model registry connection
-connection:
-  # Name of the connection secret
-  name: "model-connection"
-  # Display name for the connection
-  displayName: "Model Registry Connection"
-  # Description for the connection
-  description: "Connection secret for model registry access"
-  # Connection type
-  type: "oci-v1"
-  # Registry credentials (base64 encoded dockerconfigjson)
-  # Example: echo '{"auths":{"quay.io":{"auth":"<base64-encoded-username:token>","email":""}}}' | base64 -w 0
-  dockerConfigJson: "<BASE64_ENCODED_DOCKER_CONFIG_JSON>"
-  # Access type (base64 encoded)
-  accessType: "WyJQdWxsIl0="
-  # OCI host (base64 encoded)
-  # Example: echo "oci://quay.io/redhat-ai-services/modelcar-catalog@sha256:..." | base64 -w 0
-  ociHost: "<BASE64_ENCODED_OCI_HOST>"
-
 # Serving runtime configuration
 runtime:
   # Name of the serving runtime
