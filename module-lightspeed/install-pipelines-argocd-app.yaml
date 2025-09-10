@@ -3,8 +3,6 @@ kind: Application
 metadata:
   name: pipelines-operator
   namespace: openshift-gitops
-  labels:
-    app.kubernetes.io/managed-by: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
