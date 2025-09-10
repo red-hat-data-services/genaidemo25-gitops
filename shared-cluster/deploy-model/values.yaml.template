@@ -40,7 +40,7 @@ connection:
 # Serving runtime configuration
 runtime:
   # Name of the serving runtime
-  name: "vllm-runtime"
+  name: "model-inference-service"
   # Display name for the runtime
   displayName: "vLLM NVIDIA GPU ServingRuntime"
   # Runtime image
@@ -59,7 +59,7 @@ runtime:
 # Inference service configuration
 inference:
   # Name of the inference service
-  name: "model-inference"
+  name: "model-inference-service"
   # Display name for the inference service
   displayName: "Model Inference Service"
   # Autoscaling configuration
