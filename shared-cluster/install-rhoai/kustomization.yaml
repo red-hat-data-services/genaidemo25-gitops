@@ -3,18 +3,19 @@ kind: Kustomization
 
 resources:
   # wave 0 define namespace and RBAC
-  - namespace.yaml
-  - cluster-role-binding-dsc.yaml
+  - rhoai-operator/namespace.yaml
+  - rbac/cluster-role-binding-dsc.yaml
   # wave 1 prep
-  - subscription-authorino.yaml
+  - rbac/rhoai-setup-prerequisites.yaml
+  - authorino-operator/subscription-authorino.yaml
   # wave 2 install operator  
-  - operator-group.yaml
-  - subscription-rhoai.yaml
+  - rhoai-operator/operator-group.yaml
+  - rhoai-operator/subscription-rhoai.yaml
   # wave 3 service mesh and serverless prep
-  - subscription-servicemesh.yaml
-  - namespace-serverless.yaml
+  - servicemesh-operator/subscription-servicemesh.yaml
+  - serverless-operator/namespace-serverless.yaml
   # wave 4 serverless operator
-  - operator-group-serverless.yaml
-  - subscription-serverless.yaml
+  - serverless-operator/operator-group-serverless.yaml
+  - serverless-operator/subscription-serverless.yaml
   # wave 5 create data science cluster (creates KServe CRDs)
-  - data-science-cluster.yaml
+  - rhoai-operator/data-science-cluster.yaml
