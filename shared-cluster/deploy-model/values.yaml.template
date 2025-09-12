@@ -1,11 +1,11 @@
 # Model deployment configuration
 model:
   # Model identifier - used for naming resources
-  name: "granite-3-3-2b"
+  name: "<YOUR_MODEL_NAME>"
   # Display name for the model
-  displayName: "Granite 3.3 2B"
+  displayName: "<YOUR_MODEL_DISPLAY_NAME>"
   # Model source URI in OCI format
-  sourceUri: "oci://quay.io/redhat-ai-services/modelcar-catalog@sha256:b301bab15ab573fbdbb1f08f38b4307ccb1415f68597d55539e343b3f979a363"
+  sourceUri: "oci://<YOUR_MODELCAR_MODEL_URI>"
   # Model format for KServe
   format: "vLLM"
 
@@ -16,7 +16,7 @@ namespace:
   # Display name for the namespace
   displayName: "genai25-deployments"
   # Description for the namespace
-  description: "Data Science Project for AI Model Deployment"
+  description: ""
 
 # Serving runtime configuration
 runtime:
@@ -62,8 +62,3 @@ inference:
     - effect: NoSchedule
       key: nvidia.com/gpu
       operator: Exists
-
-# Data Science Cluster is now managed by install-rhoai ArgoCD app
-# No configuration needed here - DSC is infrastructure, not model-specific
-
-# Chart configuration (ArgoCD sync waves removed for pure Helm deployment)
