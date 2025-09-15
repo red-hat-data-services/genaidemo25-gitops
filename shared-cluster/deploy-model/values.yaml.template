@@ -15,8 +15,6 @@ namespace:
   name: "genai25-deployments"
   # Display name for the namespace
   displayName: "genai25-deployments"
-  # Description for the namespace
-  description: ""
 
 # Serving runtime configuration
 runtime:
