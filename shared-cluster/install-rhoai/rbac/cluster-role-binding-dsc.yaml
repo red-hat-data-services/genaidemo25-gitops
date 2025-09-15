@@ -1,10 +1,10 @@
-# wave 0 - grant ArgoCD permission to manage DataScienceCluster resources
+# wave 2 - grant ArgoCD permission to manage DataScienceCluster resources
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: argocd-datasciencecluster-admin
   annotations:
-    argocd.argoproj.io/sync-wave: "0"
+    argocd.argoproj.io/sync-wave: "2"
   labels:
     app.kubernetes.io/name: argocd-datasciencecluster-admin
     app.kubernetes.io/part-of: rhoai-setup

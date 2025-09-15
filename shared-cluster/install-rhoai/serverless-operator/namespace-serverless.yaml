@@ -1,9 +1,9 @@
-# wave 3 - serverless namespace
+# wave 1 - serverless namespace (installed second, after servicemesh)
 apiVersion: v1
 kind: Namespace
 metadata:
   name: openshift-serverless
   annotations:
-    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-wave: "1"
   labels:
     openshift.io/cluster-monitoring: "true"

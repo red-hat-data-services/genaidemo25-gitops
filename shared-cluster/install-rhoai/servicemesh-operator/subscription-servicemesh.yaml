@@ -1,11 +1,11 @@
-# wave 3 - service mesh operator
+# wave 0 - service mesh operator (installed first)
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
   name: servicemeshoperator
   namespace: openshift-operators
   annotations:
-    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   channel: stable
   installPlanApproval: Automatic
