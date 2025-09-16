@@ -1,10 +1,10 @@
-# wave 4 - serverless operator group
+# wave 1 - serverless operator group (installed second, after servicemesh)
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
   name: openshift-serverless-group
   namespace: openshift-serverless
   annotations:
-    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   upgradeStrategy: Default

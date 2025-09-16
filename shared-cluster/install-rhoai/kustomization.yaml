@@ -2,19 +2,17 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  # wave 0 define namespace and RBAC
-  - namespace.yaml
-  - cluster-role-binding-dsc.yaml
-  # wave 1 prep
-  - subscription-authorino.yaml
-  # wave 2 install operator  
-  - operator-group.yaml
-  - subscription-rhoai.yaml
-  # wave 3 service mesh and serverless prep
-  - subscription-servicemesh.yaml
-  - namespace-serverless.yaml
-  # wave 4 serverless operator
-  - operator-group-serverless.yaml
-  - subscription-serverless.yaml
+  # wave 0 install servicemesh first
+  - servicemesh-operator/subscription-servicemesh.yaml
+  # wave 1 install serverless second
+  - serverless-operator/namespace-serverless.yaml
+  - serverless-operator/operator-group-serverless.yaml
+  - serverless-operator/subscription-serverless.yaml
+  # wave 2 define namespace 
+  - rhoai-operator/namespace.yaml
+  - rbac/cluster-role-binding-dsc.yaml
+  # wave 4 install rhoai operator  
+  - rhoai-operator/operator-group.yaml
+  - rhoai-operator/subscription-rhoai.yaml
   # wave 5 create data science cluster (creates KServe CRDs)
-  - data-science-cluster.yaml
+  - rhoai-operator/data-science-cluster.yaml
