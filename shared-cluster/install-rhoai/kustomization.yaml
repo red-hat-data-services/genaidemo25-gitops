@@ -8,10 +8,10 @@ resources:
   - serverless-operator/namespace-serverless.yaml
   - serverless-operator/operator-group-serverless.yaml
   - serverless-operator/subscription-serverless.yaml
-  # wave 2 define namespace 
+  # wave 2 define namespace
   - rhoai-operator/namespace.yaml
   - rbac/cluster-role-binding-dsc.yaml
-  # wave 4 install rhoai operator  
+  # wave 4 install rhoai operator
   - rhoai-operator/operator-group.yaml
   - rhoai-operator/subscription-rhoai.yaml
   # wave 5 create data science cluster (creates KServe CRDs)
