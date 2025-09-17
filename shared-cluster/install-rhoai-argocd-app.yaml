@@ -11,7 +11,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/red-hat-data-services/genaidemo25-gitops.git
-    targetRevision: shared-cluster-setup
+    targetRevision: HEAD
     path: shared-cluster/install-rhoai
   destination:
     server: https://kubernetes.default.svc

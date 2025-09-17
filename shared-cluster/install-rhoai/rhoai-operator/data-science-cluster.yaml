@@ -5,6 +5,7 @@ metadata:
   name: default-dsc
   annotations:
     argocd.argoproj.io/sync-wave: "5"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
   labels:
     app.kubernetes.io/name: datasciencecluster
     app.kubernetes.io/instance: default-dsc
