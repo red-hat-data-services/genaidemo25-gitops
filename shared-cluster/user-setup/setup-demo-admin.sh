@@ -39,32 +39,6 @@ oc patch oauth cluster --type='json' -p='[
   }
 ]'
 
-# Create user and identity
-oc apply -f - <<EOF
-apiVersion: user.openshift.io/v1
-kind: User
-metadata:
-  name: ${TEST_USER}
-identities:
-- demo-admin:${TEST_USER}
-fullName: Demo Admin
-EOF
-
-# Get the user UID and create identity with matching UID
-USER_UID=$(oc get user ${TEST_USER} -o jsonpath='{.metadata.uid}')
-
-oc apply -f - <<EOF
-apiVersion: user.openshift.io/v1
-kind: Identity
-metadata:
-  name: demo-admin:${TEST_USER}
-providerName: demo-admin
-providerUserName: ${TEST_USER}
-user:
-  name: ${TEST_USER}
-  uid: ${USER_UID}
-EOF
-
 # Give basic permissions
 oc adm policy add-cluster-role-to-user view ${TEST_USER}
 oc adm policy add-cluster-role-to-user self-provisioner ${TEST_USER}

@@ -60,56 +60,6 @@ oc patch oauth cluster --type='json' -p='[
   }
 ]'
 
-echo "Creating individual User and Identity objects..."
-
-# Function to create user and identity objects
-create_user_and_identity() {
-    local user_name=$1
-
-    echo "Creating User and Identity objects for: ${user_name}"
-
-    # Create user object
-    oc apply -f - <<EOF
-apiVersion: user.openshift.io/v1
-kind: User
-metadata:
-  name: ${user_name}
-identities:
-- demo-user:${user_name}
-fullName: Demo User ${user_name}
-EOF
-
-    # Get the user UID and create identity with matching UID
-    USER_UID=$(oc get user ${user_name} -o jsonpath='{.metadata.uid}')
-
-    oc apply -f - <<EOF
-apiVersion: user.openshift.io/v1
-kind: Identity
-metadata:
-  name: demo-user:${user_name}
-providerName: demo-user
-providerUserName: ${user_name}
-user:
-  name: ${user_name}
-  uid: ${USER_UID}
-EOF
-
-    # Give basic permissions (normal user permissions)
-    oc adm policy add-cluster-role-to-user view ${user_name}
-    oc adm policy add-cluster-role-to-user self-provisioner ${user_name}
-
-    echo "${user_name} created successfully!"
-}
-
-# Create User and Identity objects for all demo users
-for i in {01..20}; do
-    user_name="demo${i}"
-    create_user_and_identity "${user_name}"
-
-    # Small delay to avoid overwhelming the API server
-    sleep 0.5
-done
-
 echo ""
 echo "All 20 demo users created successfully!"
 echo "Users: demo01, demo02, demo03, ..., demo20"
