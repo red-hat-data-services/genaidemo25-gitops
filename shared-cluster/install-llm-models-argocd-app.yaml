@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: llm-models
+  namespace: openshift-gitops
+  labels:
+    app.kubernetes.io/managed-by: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - repoURL: https://github.com/kpiwko/genaidemo25-gitops.git
+      targetRevision: main
+      path: shared-cluster/deploy-model
+      helm:
+        releaseName: gpt-oss-20b
+        valueFiles:
+          - "gpt-oss-20b.yaml"
+    - repoURL: https://github.com/kpiwko/genaidemo25-gitops.git
+      targetRevision: main
+      path: shared-cluster/deploy-model
+      helm:
+        releaseName: gemma-3-27b
+        valueFiles:
+          - "gemma-3-27b.yaml"
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: "genai25-deployments"
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions: []

@@ -6,6 +6,76 @@ This repository provides streamlined GitOps configurations to automate the deplo
 
 **Red Hat OpenShift GitOps operator** (productized ArgoCD) must be installed on the target cluster(s) before deploying these configurations. This operator is typically available through the OpenShift OperatorHub.
 
+## Model Deployment
+
+This repo now separates namespace/RBAC bootstrap from model deployment. Deploy the namespace once, then manage any number of models safely.
+
+### 0) Prereqs
+
+- OpenShift GitOps (Argo CD) installed
+- RHOAI/KServe installed (use `shared-cluster/install-rhoai-argocd-app.yaml`)
+
+### 1) Bootstrap namespace and KServe RBAC (Argo-managed)
+
+```bash
+oc apply -n openshift-gitops -f shared-cluster/install-llm-namespace-argocd-app.yaml
+```
+
+This creates `genai25-deployments` and binds Argo CD controller to a namespace `Role` defined in `shared-cluster/kserve-rbac.yaml`.
+
+Alternative (without the app):
+
+```bash
+oc create namespace genai25-deployments || true
+```
+
+### 2) Create image pull secret (if needed)
+
+```bash
+oc -n genai25-deployments create secret docker-registry genai2025-pull-secret \
+  --docker-server=quay.io \
+  --docker-username='<user-or-robot>' \
+  --docker-password='<password-or-token>' \
+  --docker-email='<you@example.com>'
+```
+
+### 3) Configure models (values)
+
+- `shared-cluster/deploy-model/gpt-oss-20b.yaml` and `shared-cluster/deploy-model/gemma-3-27b.yaml`
+- Ensure:
+  - `namespace.create: false`
+  - `connection.name` points to your pull secret (if required)
+  - Unique `runtime.name` and `inference.name` per model
+
+### 4) Install models via Argo CD (multi-source App)
+
+```bash
+oc apply -n openshift-gitops -f shared-cluster/install-llm-models-argocd-app.yaml
+```
+
+This single Application deploys both models from the same chart (multi-source). The namespace is created and managed by the `llm-namespace` app; the models app does not create namespaces.
+
+### 5) Verify
+
+```bash
+oc get ns genai25-deployments
+oc -n genai25-deployments get servingruntimes.serving.kserve.io
+oc -n genai25-deployments get inferenceservices.serving.kserve.io
+oc -n genai25-deployments get ksvc
+```
+
+Notes:
+
+- For `oss-gpt-20b`, this chart sets a custom vLLM runtime image (0.10.1) and supports extra args via `runtime.extraArgs`.
+- To dry-run Helm locally before Argo sync:
+
+```bash
+helm template test /Users/kpiwko/devel/ai-experiments/genaidemo25-gitops/shared-cluster/deploy-model \
+  -n genai25-deployments \
+  -f /Users/kpiwko/devel/ai-experiments/genaidemo25-gitops/shared-cluster/deploy-model/gpt-oss-20b.yaml \
+| kubectl apply --dry-run=client -f -
+```
+
 ## 📁 Repository Structure
 
 ```
