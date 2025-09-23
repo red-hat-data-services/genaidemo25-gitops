@@ -114,6 +114,8 @@ function cleanup_web_terminal() {
   delete_resources devworkspaces.workspace.devfile.io
   delete_resources devworkspacetemplates.workspace.devfile.io
 
+  delete_webhooks "controller.devfile.io"
+
   delete_olm_resources openshift-operators devworkspace-operator devworkspace-operator
   delete_olm_resources openshift-operators web-terminal web-terminal
 
@@ -126,5 +128,6 @@ function cleanup_web_terminal() {
   delete_marketplace_resources "devworkspace-operator-bundle"
 }
 
+oc delete -f ./lightspeed-applicationset.yaml --ignore-not-found
 cleanup_openshift_pipelines
 cleanup_web_terminal
