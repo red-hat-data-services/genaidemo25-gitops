@@ -2,7 +2,7 @@
 set -e
 
 # Load test user and password from environment variables, with defaults if not set
-TEST_USER="${TEST_USER:-test-user}"
+TEST_USER="${TEST_USER:-demo-admin}"
 TEST_PASSWORD="${TEST_PASSWORD:-password123}"
 
 echo "Setting up ${TEST_USER} with ${TEST_PASSWORD}..."
@@ -14,7 +14,7 @@ oc apply -f - <<EOF
 apiVersion: v1
 kind: Secret
 metadata:
-  name: htpass-secret-test-user
+  name: htpass-secret-demo-admin
   namespace: openshift-config
 type: Opaque
 data:
@@ -27,12 +27,12 @@ oc patch oauth cluster --type='json' -p='[
     "op": "add",
     "path": "/spec/identityProviders/-",
     "value": {
-      "name": "test-user-htpasswd",
+      "name": "demo-admin",
       "mappingMethod": "claim",
       "type": "HTPasswd",
       "htpasswd": {
         "fileData": {
-          "name": "htpass-secret-test-user"
+          "name": "htpass-secret-demo-admin"
         }
       }
     }
@@ -46,8 +46,8 @@ kind: User
 metadata:
   name: ${TEST_USER}
 identities:
-- test-user-htpasswd:${TEST_USER}
-fullName: Test User
+- demo-admin:${TEST_USER}
+fullName: Demo Admin
 EOF
 
 # Get the user UID and create identity with matching UID
@@ -57,8 +57,8 @@ oc apply -f - <<EOF
 apiVersion: user.openshift.io/v1
 kind: Identity
 metadata:
-  name: test-user-htpasswd:${TEST_USER}
-providerName: test-user-htpasswd
+  name: demo-admin:${TEST_USER}
+providerName: demo-admin
 providerUserName: ${TEST_USER}
 user:
   name: ${TEST_USER}
@@ -69,5 +69,5 @@ EOF
 oc adm policy add-cluster-role-to-user view ${TEST_USER}
 oc adm policy add-cluster-role-to-user self-provisioner ${TEST_USER}
 
-echo "✅ ${TEST_USER} created successfully!"
+echo "${TEST_USER} created successfully!"
 echo "Login with: oc login -u ${TEST_USER} -p ${TEST_PASSWORD}"
