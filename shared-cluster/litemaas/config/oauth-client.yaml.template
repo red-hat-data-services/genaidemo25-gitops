@@ -1,0 +1,9 @@
+apiVersion: oauth.openshift.io/v1
+kind: OAuthClient
+grantMethod: auto
+metadata:
+  name: litemaas-oauth-client
+secret: CBatk7ZwjqeGwqxST06A5efIW3DLPZaghexpoZwwlhw=
+redirectURIs:
+  - 'https://litemaas-litemaas.${CLUSTER_DOMAIN_NAME}/api/auth/callback'
+
