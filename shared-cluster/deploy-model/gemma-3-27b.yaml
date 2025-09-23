@@ -1,0 +1,65 @@
+# Model deployment configuration
+model:
+  # Model identifier - used for naming resources
+  name: "gemma-3-27b"
+  # Display name for the model
+  displayName: "Gemma 3 27B"
+  # Model source URI
+  sourceUri: "oci://quay.io/dprod/gemma-3-27b-w8a8:latest"
+  # Model format for KServe
+  format: "vLLM"
+
+# Namespace configuration
+namespace:
+  # Name of the namespace to deploy into
+  name: "genai25-deployments"
+
+# Serving runtime configuration
+runtime:
+  # Name of the serving runtime
+  name: "vllm-cuda-runtime-gemma"
+  # Display name for the runtime
+  displayName: "RH OpenShift AI 2.24 vLLM"
+  # Runtime image
+  image: "quay.io/modh/vllm@sha256:b2391f71951de276722ee5c91a92da4537da36297c9b9d1f2a67ecbaee0214eb"
+  # Runtime annotations
+  annotations:
+    acceleratorName: "nvidia-gpu"
+    apiProtocol: "REST"
+    hardwareProfileName: ""
+    recommendedAccelerators: '["nvidia.com/gpu"]'
+    runtimeVersion: "v0.10.0"
+    servingRuntimeScope: "global"
+    templateDisplayName: "RH OpenShift AI 2.24vLLM"
+    templateName: "vllm-cuda-runtime-gemma"
+  extraArgs:
+    - --gpu_memory_utilization=0.95
+
+# Inference service configuration
+inference:
+  # Name of the inference service
+  name: "vlm-model-service"
+  # Display name for the inference service
+  displayName: "Vision LLM Model Service"
+  # Autoscaling configuration
+  scaling:
+    minReplicas: 1
+    maxReplicas: 1
+  # Resource requirements
+  resources:
+    requests:
+      cpu: "4"
+      memory: "8Gi"
+      gpu: "1"
+    limits:
+      cpu: "8"
+      memory: "10Gi"
+      gpu: "1"
+  # GPU tolerations
+  tolerations:
+    - effect: NoSchedule
+      key: nvidia.com/gpu
+      operator: Exists
+
+connection:
+  name: "genai2025-pull-secret"
