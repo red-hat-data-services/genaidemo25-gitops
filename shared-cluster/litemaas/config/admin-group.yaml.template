@@ -1,0 +1,8 @@
+apiVersion: user.openshift.io/v1
+kind: Group
+metadata:
+  name: litemaas-admins
+users:
+  - admin
+  - demo-admin
+  - htpasswd-cluster-admin-user 
