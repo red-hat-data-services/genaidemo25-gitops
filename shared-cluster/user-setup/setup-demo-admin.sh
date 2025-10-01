@@ -39,7 +39,8 @@ oc patch oauth cluster --type='json' -p='[
   }
 ]'
 
-# Give basic permissions
+# Give cluster admin permissions
+oc adm policy add-cluster-role-to-user cluster-admin ${TEST_USER}
 oc adm policy add-cluster-role-to-user view ${TEST_USER}
 oc adm policy add-cluster-role-to-user self-provisioner ${TEST_USER}
 
