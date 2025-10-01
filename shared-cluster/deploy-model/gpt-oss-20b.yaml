@@ -34,7 +34,7 @@ runtime:
     templateName: "vllm-cuda-runtime-gptoss"
   extraArgs:
     - --chat-template=/app/data/template/template_gptoss.jinja
-    - --max-model-len=464
+    - --max-model-len=5000
     - --gpu_memory_utilization=0.95
 
 # Inference service configuration
