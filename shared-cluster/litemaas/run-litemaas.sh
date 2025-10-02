@@ -36,6 +36,18 @@ git fetch
 git checkout $LITEMAAS_GIT_REVISION
 cd ..
 
+# Generate random strings for secrets
+JWT_SECRET=$(openssl rand -base64 32)
+OAUTH_CLIENT_SECRET=$(openssl rand -base64 32)
+ADMIN_API_KEY=$(openssl rand -hex 16)
+LITELLM_API_KEY=$(openssl rand -hex 16)
+
+# Export the generated values for use in templates
+export JWT_SECRET
+export OAUTH_CLIENT_SECRET
+export ADMIN_API_KEY
+export LITELLM_API_KEY
+
 cp -r config/* $LITEMAAS_DIR
 cd $LITEMAAS_DIR
 
