@@ -11,6 +11,7 @@ resources:
   # wave 2 define namespace
   - rhoai-operator/namespace.yaml
   - rbac/cluster-role-binding-dsc.yaml
+  - rbac/argocd-istio-routes-rbac.yaml
   # wave 4 install rhoai operator
   - rhoai-operator/operator-group.yaml
   - rhoai-operator/subscription-rhoai.yaml
