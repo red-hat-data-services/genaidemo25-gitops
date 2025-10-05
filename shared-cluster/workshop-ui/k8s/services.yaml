@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: workshop-server
+  labels:
+    app: workshop-server
+spec:
+  selector:
+    app: workshop-server
+  ports:
+  - port: 3001
+    targetPort: 3001
+    protocol: TCP
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: workshop-client
+  labels:
+    app: workshop-client
+spec:
+  selector:
+    app: workshop-client
+  ports:
+  - port: 3000
+    targetPort: 3000
+    protocol: TCP
+  type: ClusterIP

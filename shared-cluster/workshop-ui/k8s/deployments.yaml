@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: workshop-server
+  labels:
+    app: workshop-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: workshop-server
+  template:
+    metadata:
+      labels:
+        app: workshop-server
+    spec:
+      serviceAccountName: workshop-sa
+      containers:
+      - name: workshop-server
+        image: image-registry.openshift-image-registry.svc:5000/workshop-ui/workshop-server:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3001
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3001"
+        - name: DB_PATH
+          value: "/app/data/workshop.db"
+        - name: DATABASE_URL
+          value: "file:/app/data/workshop.db"
+        volumeMounts:
+        - name: server-data
+          mountPath: /app/data
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3001
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: server-data
+        persistentVolumeClaim:
+          claimName: workshop-server-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: workshop-client
+  labels:
+    app: workshop-client
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: workshop-client
+  template:
+    metadata:
+      labels:
+        app: workshop-client
+    spec:
+      serviceAccountName: workshop-sa
+      containers:
+      - name: workshop-client
+        image: image-registry.openshift-image-registry.svc:5000/workshop-ui/workshop-client:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5

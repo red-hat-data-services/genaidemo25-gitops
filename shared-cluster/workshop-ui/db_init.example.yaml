@@ -1,0 +1,68 @@
+
+# Shared cluster configuration (same for all users)
+shared_cluster:
+  username: "shared-user"
+  password: "shared-password-123"
+  cluster_url: "https://shared-dev.openshift.example.com:6443"
+  lite_maas_url: "https://litemaas-shared-dev.openshift.example.com:6443"
+
+# User-specific clusters configuration
+user_clusters:
+  - username: "john.doe"
+    password: "john-password-456"
+    cluster_url: "https://console-openshift-console.apps.c1a2b3.openshift.example.com"
+  
+  - username: "jane.smith"
+    password: "jane-password-789"
+    cluster_url: "https://console-openshift-console.apps.d4e5f6.openshift.example.com"
+  
+  - username: "admin.user"
+    password: "admin-password-101"
+    cluster_url: "https://console-openshift-console.apps.a7b8c9.openshift.example.com"
+  
+  - username: "inactive.user"
+    password: "inactive-password-202"
+    cluster_url: "https://console-openshift-console.apps.f0e1d2.openshift.example.com"
+
+# Demo users configuration
+demo_users:
+  - username: "user1"
+    password: "password1"
+  - username: "user2"
+    password: "password2"
+  - username: "user3"
+    password: "password3"
+  - username: "user4"
+    password: "password4"
+  - username: "user5"
+    password: "password5"
+  - username: "user6"
+    password: "password6"
+  - username: "user7"
+    password: "password7"
+  - username: "user8"
+    password: "password8"
+  - username: "user9"
+    password: "password9"
+  - username: "user10"
+    password: "password10"
+  - username: "user11"
+    password: "password11"
+  - username: "user12"
+    password: "password12"
+  - username: "user13"
+    password: "password13"
+  - username: "user14"
+    password: "password14"
+  - username: "user15"
+    password: "password15"
+  - username: "user16"
+    password: "password16"
+  - username: "user17"
+    password: "password17"
+  - username: "user18"
+    password: "password18"
+  - username: "user19"
+    password: "password19"
+  - username: "user20"
+    password: "password20"

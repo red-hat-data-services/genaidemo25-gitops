@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Cluster {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  url         String
+  username    String
+  password    String
+  isReserved  Boolean  @default(false)
+  reservedBy  String?
+  reservedAt  DateTime?
+  createdAt   DateTime @default(now())
+  
+  workshopUsers WorkshopUser[]
+  
+  @@map("clusters")
+}
+
+model DemoUser {
+  id          Int      @id @default(autoincrement())
+  username    String   @unique
+  password    String
+  isReserved  Boolean  @default(false)
+  reservedBy  String?
+  reservedAt  DateTime?
+  createdAt   DateTime @default(now())
+  
+  workshopUsers WorkshopUser[]
+  
+  @@map("demo_users")
+}
+
+model WorkshopUser {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  clusterId    Int?
+  demoUserId   Int?
+  sessionToken String?
+  createdAt    DateTime @default(now())
+  lastLogin    DateTime?
+  
+  cluster   Cluster?  @relation(fields: [clusterId], references: [id])
+  demoUser  DemoUser? @relation(fields: [demoUserId], references: [id])
+  
+  @@map("workshop_users")
+}
+
+model SharedCluster {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  url  String
+  
+  @@map("shared_clusters")
+}
