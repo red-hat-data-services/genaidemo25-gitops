@@ -1,20 +1,20 @@
 #!/bin/bash
 set -e
 
-# Load password from environment variable, with default if not set
-TEST_PASSWORD="${TEST_PASSWORD:-password123}"
+# Password will be generated per user as password${i}
 
-echo "Setting up 20 demo users (demo01-demo20) with password: ${TEST_PASSWORD}..."
+echo "Setting up 20 demo users (user1-user20) with passwords password1-password20..."
 
 # Create combined htpasswd file with all demo users
 echo "Creating combined htpasswd file..."
 COMBINED_HTPASSWD=""
-for i in {01..20}; do
-    user_name="demo${i}"
-    echo "Adding ${user_name} to htpasswd file..."
+for i in {1..20}; do
+    user_name="user${i}"
+    user_password="password${i}"
+    echo "Adding ${user_name} to htpasswd file with password ${user_password}..."
 
     # Generate htpasswd entry for this user
-    HTPASSWD_ENTRY=$(htpasswd -nbB "${user_name}" "${TEST_PASSWORD}")
+    HTPASSWD_ENTRY=$(htpasswd -nbB "${user_name}" "${user_password}")
 
     if [ -z "$COMBINED_HTPASSWD" ]; then
         COMBINED_HTPASSWD="$HTPASSWD_ENTRY"
@@ -62,8 +62,8 @@ oc patch oauth cluster --type='json' -p='[
 
 echo ""
 echo "All 20 demo users created successfully!"
-echo "Users: demo01, demo02, demo03, ..., demo20"
-echo "Password for all users: ${TEST_PASSWORD}"
+echo "Users: user1, user2, user3, ..., user20"
+echo "Passwords: password1, password2, password3, ..., password20"
 echo "OAuth Identity Provider: demo-user (single entry)"
 echo ""
-echo "Example login: oc login -u demo01 -p ${TEST_PASSWORD}"
+echo "Example login: oc login -u user1 -p password1"
