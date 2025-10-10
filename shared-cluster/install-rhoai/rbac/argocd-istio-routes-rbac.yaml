@@ -1,0 +1,35 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: argocd-istio-routes-writer
+  namespace: istio-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  labels:
+    app.kubernetes.io/name: argocd-istio-routes-writer
+    app.kubernetes.io/part-of: rhoai-setup
+    app.kubernetes.io/managed-by: kustomize
+rules:
+  - apiGroups: ["route.openshift.io"]
+    resources: ["routes"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: argocd-istio-routes-writer-binding
+  namespace: istio-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  labels:
+    app.kubernetes.io/name: argocd-istio-routes-writer-binding
+    app.kubernetes.io/part-of: rhoai-setup
+    app.kubernetes.io/managed-by: kustomize
+subjects:
+  - kind: ServiceAccount
+    name: openshift-gitops-argocd-application-controller
+    namespace: openshift-gitops
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: argocd-istio-routes-writer

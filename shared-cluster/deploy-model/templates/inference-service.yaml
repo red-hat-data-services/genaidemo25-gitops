@@ -15,8 +15,10 @@ metadata:
 spec:
   predictor:
     automountServiceAccountToken: false
+    {{- if .Values.connection.name }}
     imagePullSecrets:
     - name: {{ .Values.connection.name }}
+    {{- end }}
     maxReplicas: {{ .Values.inference.scaling.maxReplicas }}
     minReplicas: {{ .Values.inference.scaling.minReplicas }}
     model:
@@ -38,3 +40,5 @@ spec:
     tolerations:
     {{- toYaml .Values.inference.tolerations | nindent 4 }}
     {{- end }}
+
+

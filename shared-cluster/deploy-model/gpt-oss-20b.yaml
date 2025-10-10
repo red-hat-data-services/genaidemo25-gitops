@@ -1,0 +1,67 @@
+# Model deployment configuration
+model:
+  # Model identifier - used for naming resources
+  name: "oss-gpt-20b"
+  # Display name for the model
+  displayName: "GPT-OSS 20B"
+  # Model source URI
+  sourceUri: "oci://quay.io/castawayegr/modelcar-catalog:gpt-oss-20b"
+  # Model format for KServe
+  format: "vLLM"
+
+# Namespace configuration
+namespace:
+  # Name of the namespace to deploy into
+  name: "genai25-deployments"
+
+# Serving runtime configuration
+runtime:
+  # Name of the serving runtime
+  name: "vllm-cuda-runtime-gptoss"
+  # Display name for the runtime
+  displayName: "GPT-OSS vLLM with BitsandBytes NVIDIA GPU ServingRuntime for KServe"
+  # Runtime image
+  image: "quay.io/castawayegr/vllm:0.10.1-gptoss"
+  # Runtime annotations
+  annotations:
+    acceleratorName: "nvidia-gpu"
+    apiProtocol: "REST"
+    hardwareProfileName: ""
+    recommendedAccelerators: '["nvidia.com/gpu"]'
+    runtimeVersion: "v0.10.1"
+    servingRuntimeScope: "global"
+    templateDisplayName: "GPT-OSS vLLM with BitsandBytes NVIDIA GPU ServingRuntime for KServe"
+    templateName: "vllm-cuda-runtime-gptoss"
+  extraArgs:
+    - --chat-template=/app/data/template/template_gptoss.jinja
+    - --max-model-len=10000
+    - --gpu_memory_utilization=0.95
+
+# Inference service configuration
+inference:
+  # Name of the inference service
+  name: "reasoning-model-service"
+  # Display name for the inference service
+  displayName: "Reasoning Model Service"
+  # Autoscaling configuration
+  scaling:
+    minReplicas: 1
+    maxReplicas: 1
+  # Resource requirements
+  resources:
+    requests:
+      cpu: "4"
+      memory: "8Gi"
+      gpu: "1"
+    limits:
+      cpu: "8"
+      memory: "10Gi"
+      gpu: "1"
+  # GPU tolerations
+  tolerations:
+    - effect: NoSchedule
+      key: nvidia.com/gpu
+      operator: Exists
+
+connection:
+  name: "genai2025-pull-secret"
