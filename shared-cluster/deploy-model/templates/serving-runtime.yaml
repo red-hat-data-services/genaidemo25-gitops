@@ -37,6 +37,13 @@ spec:
       env:
         - name: HF_HOME
           value: /tmp/hf_home
+        {{- if and (hasPrefix "hf://" .Values.model.sourceUri) .Values.huggingface.tokenSecret }}
+        - name: HF_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.huggingface.tokenSecret }}
+              key: token
+        {{- end }}
       image: {{ .Values.runtime.image }}
       name: kserve-container
       ports:
