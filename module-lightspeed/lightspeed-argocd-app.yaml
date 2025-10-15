@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: module-lightspeed
+  namespace: openshift-gitops
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - repoURL: https://github.com/red-hat-data-services/genaidemo25-gitops.git
+      targetRevision: HEAD
+      path: module-lightspeed/install-pipelines
+    - repoURL: https://github.com/red-hat-data-services/genaidemo25-gitops.git
+      targetRevision: HEAD
+      path: module-lightspeed/install-web-terminal
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openshift-operators
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+      - RespectIgnoreDifferences=true
+  revisionHistoryLimit: 3
