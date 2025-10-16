@@ -64,11 +64,31 @@ async function main() {
 }
 
 async function showStatus() {
-  console.log('=== Cluster Status ===');
+  console.log('=== Shared Clusters ===');
+  const sharedClusters = await prisma.sharedCluster.findMany({ orderBy: { id: 'asc' } });
+  console.log(`Total shared clusters: ${sharedClusters.length}`);
+  sharedClusters.forEach(cluster => {
+    console.log(`ID: ${cluster.id}, Name: ${cluster.name}, URL: ${cluster.url}`);
+  });
+
+  console.log('\n=== User Clusters (Individual Clusters) ===');
   const clusters = await prisma.cluster.findMany({ orderBy: { id: 'asc' } });
+  const reservedClusters = clusters.filter(c => c.isReserved).length;
+  const availableClusters = clusters.filter(c => !c.isReserved).length;
+  console.log(`Total user clusters: ${clusters.length} (Reserved: ${reservedClusters}, Available: ${availableClusters})`);
   clusters.forEach(cluster => {
     const status = cluster.isReserved ? `RESERVED by ${cluster.reservedBy}` : 'AVAILABLE';
-    console.log(`ID: ${cluster.id}, Name: ${cluster.name}, Reserved: ${cluster.isReserved ? 1 : 0}, By: ${cluster.reservedBy || 'null'}`);
+    console.log(`ID: ${cluster.id}, Name: ${cluster.name}, URL: ${cluster.url}, Status: ${status}`);
+  });
+
+  console.log('\n=== Demo Users ===');
+  const demoUsers = await prisma.demoUser.findMany({ orderBy: { id: 'asc' } });
+  const reservedUsers = demoUsers.filter(u => u.isReserved).length;
+  const availableUsers = demoUsers.filter(u => !u.isReserved).length;
+  console.log(`Total demo users: ${demoUsers.length} (Reserved: ${reservedUsers}, Available: ${availableUsers})`);
+  demoUsers.forEach(user => {
+    const status = user.isReserved ? `RESERVED by ${user.reservedBy}` : 'AVAILABLE';
+    console.log(`ID: ${user.id}, Username: ${user.username}, Status: ${status}`);
   });
 
   console.log('\n=== Workshop Users (Registered Accounts) ===');
@@ -76,16 +96,6 @@ async function showStatus() {
   console.log(`Total workshop users: ${workshopUsers.length}`);
   workshopUsers.forEach(user => {
     console.log(`ID: ${user.id}, Email: ${user.email}, Cluster: ${user.clusterId}, Demo User: ${user.demoUserId}, Created: ${user.createdAt}`);
-  });
-
-  console.log('\n=== All Demo Users Status ===');
-  const demoUsers = await prisma.demoUser.findMany({ orderBy: { id: 'asc' } });
-  const reservedCount = demoUsers.filter(u => u.isReserved).length;
-  const unreservedCount = demoUsers.filter(u => !u.isReserved).length;
-  console.log(`Total demo users: ${demoUsers.length} (Reserved: ${reservedCount}, Available: ${unreservedCount})`);
-  demoUsers.forEach(user => {
-    const status = user.isReserved ? `RESERVED by ${user.reservedBy}` : 'AVAILABLE';
-    console.log(`ID: ${user.id}, User: ${user.username}, Status: ${status}`);
   });
 }
 
@@ -349,22 +359,30 @@ async function loadUserClustersData(userClusters) {
   let addedCount = 0;
   let skippedCount = 0;
 
-  for (const clusterData of userClusters) {
-    const { cluster_url, username } = clusterData;
+  for (let i = 0; i < userClusters.length; i++) {
+    const clusterData = userClusters[i];
+    const { cluster_url, username, password } = clusterData;
     
     if (!cluster_url) {
-      console.log(`Skipping cluster - missing cluster_url for user: ${username || 'unknown'}`);
+      console.log(`Skipping cluster - missing cluster_url`);
       skippedCount++;
       continue;
     }
 
-    // Generate cluster name from username or use a default pattern
-    const clusterName = username ? `cluster-${username}` : `cluster-${addedCount + 1}`;
+    // Extract cluster name from URL (e.g., "cluster-l6m6w" from "https://console-openshift-console.apps.cluster-l6m6w.dynamic...")
+    let clusterName;
+    const urlMatch = cluster_url.match(/apps\.(cluster-[^.]+)/);
+    if (urlMatch) {
+      clusterName = urlMatch[1];
+    } else {
+      // Fallback to index-based naming if URL pattern doesn't match
+      clusterName = `cluster-${i + 1}`;
+    }
 
-    // Check if cluster name already exists
-    const existingCluster = await prisma.cluster.findUnique({ where: { name: clusterName } });
+    // Check if cluster already exists by URL (more reliable than name)
+    const existingCluster = await prisma.cluster.findFirst({ where: { url: cluster_url } });
     if (existingCluster) {
-      console.log(`Cluster "${clusterName}" already exists, skipping...`);
+      console.log(`Cluster "${clusterName}" (${cluster_url}) already exists, skipping...`);
       skippedCount++;
       continue;
     }
@@ -373,8 +391,8 @@ async function loadUserClustersData(userClusters) {
       data: { 
         name: clusterName, 
         url: cluster_url, 
-        username: '', // Empty username - demo users are separate
-        password: ''  // Empty password - demo users are separate
+        username: username || '', 
+        password: password || ''
       }
     });
 

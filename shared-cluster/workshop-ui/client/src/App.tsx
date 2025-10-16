@@ -87,6 +87,16 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  // Helper function to generate Vision URL from console URL
+  const getVisionUrl = (consoleUrl: string): string => {
+    return consoleUrl.replace(/https:\/\/[^.]+\.apps\./, 'https://vision-rules-vision-rules.apps.');
+  };
+
+  // Helper function to generate LiteMaaS URL from console URL
+  const getLiteMaasUrl = (consoleUrl: string): string => {
+    return consoleUrl.replace(/https:\/\/[^.]+\.apps\./, 'https://litemaas-litemaas.apps.');
+  };
+
   useEffect(() => {
     // Check if user is already logged in
     const token = localStorage.getItem('workshop_token');
@@ -457,18 +467,38 @@ const App: React.FC = () => {
                   </StackItem>
                   
                   <StackItem>
-                      <Button
-                        component="a"
-                        href={user.cluster.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        variant="primary"
-                        icon={<ExternalLinkAltIcon />}
-                        iconPosition="right"
-                        size="lg"
-                      >
-                        Open Cluster Console
-                      </Button>
+                    <Grid hasGutter>
+                      <GridItem span={6}>
+                        <Button
+                          component="a"
+                          href={user.cluster.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          variant="primary"
+                          icon={<ExternalLinkAltIcon />}
+                          iconPosition="right"
+                          size="lg"
+                          isBlock
+                        >
+                          Open Cluster Console
+                        </Button>
+                      </GridItem>
+                      <GridItem span={6}>
+                        <Button
+                          component="a"
+                          href={getVisionUrl(user.cluster.url)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          variant="secondary"
+                          icon={<ExternalLinkAltIcon />}
+                          iconPosition="right"
+                          size="lg"
+                          isBlock
+                        >
+                          Open Vision Rules
+                        </Button>
+                      </GridItem>
+                    </Grid>
                   </StackItem>
                 </Stack>
               </CardBody>
@@ -548,20 +578,38 @@ const App: React.FC = () => {
                   </StackItem>
                   
                   <StackItem>
-                    <div className="pf-v6-u-text-align-center">
-                      <Button
-                        component="a"
-                        href={user.sharedCluster.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        variant="primary"
-                        icon={<ExternalLinkAltIcon />}
-                        iconPosition="right"
-                        size="lg"
-                      >
-                        Open Shared Cluster Console
-                      </Button>
-                    </div>
+                    <Grid hasGutter>
+                      <GridItem span={6}>
+                        <Button
+                          component="a"
+                          href={user.sharedCluster.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          variant="primary"
+                          icon={<ExternalLinkAltIcon />}
+                          iconPosition="right"
+                          size="lg"
+                          isBlock
+                        >
+                          Open Shared Cluster Console
+                        </Button>
+                      </GridItem>
+                      <GridItem span={6}>
+                        <Button
+                          component="a"
+                          href={getLiteMaasUrl(user.sharedCluster.url)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          variant="secondary"
+                          icon={<ExternalLinkAltIcon />}
+                          iconPosition="right"
+                          size="lg"
+                          isBlock
+                        >
+                          Open LiteMaaS
+                        </Button>
+                      </GridItem>
+                    </Grid>
                   </StackItem>
                 </Stack>
               </CardBody>
