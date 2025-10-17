@@ -17,7 +17,7 @@ spec:
       serviceAccountName: workshop-sa
       containers:
       - name: workshop-server
-        image: image-registry.openshift-image-registry.svc:5000/workshop-ui/workshop-server:latest
+        image: quay.io/genai25-demo/workshop-ui-server:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 3001
@@ -76,7 +76,7 @@ spec:
       serviceAccountName: workshop-sa
       containers:
       - name: workshop-client
-        image: image-registry.openshift-image-registry.svc:5000/workshop-ui/workshop-client:latest
+        image: quay.io/genai25-demo/workshop-ui-client:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
