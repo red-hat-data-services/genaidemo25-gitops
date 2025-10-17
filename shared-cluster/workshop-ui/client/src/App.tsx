@@ -392,240 +392,226 @@ const App: React.FC = () => {
         </PageSection>
 
         <PageSection isFilled>
-          {user.cluster ? (
-            <Card className="cluster-info-card">
+          {/* Credentials Section - Shown once for both clusters */}
+          {(user.cluster || user.sharedCluster) && (
+            <Card className="cluster-info-card pf-v6-u-mb-lg">
               <CardHeader>
-                <Flex
-                  justifyContent={{ default: 'justifyContentSpaceBetween' }}
-                  alignItems={{ default: 'alignItemsCenter' }}
-                >
-                  <FlexItem>
-                    <CardTitle>Your User Cluster Info</CardTitle>
-                  </FlexItem>
-                  <FlexItem>
-                    <Button
-                      variant="danger"
-                      onClick={handleReleaseCluster}
-                      isLoading={isLoading}
+                <CardTitle>Cluster Credentials</CardTitle>
+              </CardHeader>
+              <CardBody>
+                <Grid hasGutter>
+                  <GridItem span={6}>
+                    <Title headingLevel="h3" size="md" className="pf-v6-u-mb-sm">
+                      Username
+                    </Title>
+                    <ClipboardCopy
+                      variant={ClipboardCopyVariant.inline}
+                      hoverTip="Copy"
+                      clickTip="Copied!"
                     >
-                      Release Cluster
-                    </Button>
-                  </FlexItem>
-                </Flex>
-              </CardHeader>
-              <CardBody>
-                <Stack hasGutter>
-                  <StackItem>
-                    <div className="pf-v6-u-text-align-center">
-                      <Title headingLevel="h2" size="lg" className="pf-v6-u-color-100 pf-v6-u-mb-sm">
-                        {user.cluster.name}
-                      </Title>
-                      <p className="pf-v6-u-color-200 pf-v6-u-mb-md">
-                        Cluster Console URL
-                      </p>
-                      <ClipboardCopy
-                        variant={ClipboardCopyVariant.inline}
-                        hoverTip="Copy"
-                        clickTip="Copied!"
-                      >
-                        {user.cluster.url}
-                      </ClipboardCopy>
-                    </div>
-                  </StackItem>
-                  
-                  <StackItem>
-                    <Grid hasGutter>
-                      <GridItem span={6}>
-                          <Title headingLevel="h3" size="md" className="pf-v6-u-mb-sm">
-                            Username
-                          </Title>
-                          <ClipboardCopy
-                            variant={ClipboardCopyVariant.inline}
-                            hoverTip="Copy"
-                            clickTip="Copied!"
-                          >
-                            {user.cluster.username}
-                          </ClipboardCopy>
-                      </GridItem>
-                      <GridItem span={6}>
-                          <Title headingLevel="h3" size="md" className="pf-v6-u-mb-sm">
-                            Password
-                          </Title>
-                          <ClipboardCopy
-                            variant={ClipboardCopyVariant.inline}
-                            hoverTip="Copy"
-                            clickTip="Copied!"
-                          >
-                            {user.cluster.password}
-                          </ClipboardCopy>
-                      </GridItem>
-                    </Grid>
-                  </StackItem>
-                  
-                  <StackItem>
-                    <Divider />
-                  </StackItem>
-                  
-                  <StackItem>
-                    <Grid hasGutter>
-                      <GridItem span={6}>
-                        <Button
-                          component="a"
-                          href={user.cluster.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          variant="primary"
-                          icon={<ExternalLinkAltIcon />}
-                          iconPosition="right"
-                          size="lg"
-                          isBlock
-                        >
-                          Open Cluster Console
-                        </Button>
-                      </GridItem>
-                      <GridItem span={6}>
-                        <Button
-                          component="a"
-                          href={getVisionUrl(user.cluster.url)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          variant="secondary"
-                          icon={<ExternalLinkAltIcon />}
-                          iconPosition="right"
-                          size="lg"
-                          isBlock
-                        >
-                          Open Vision Rules
-                        </Button>
-                      </GridItem>
-                    </Grid>
-                  </StackItem>
-                </Stack>
+                      {user.cluster?.username || user.sharedCluster?.username || 'N/A'}
+                    </ClipboardCopy>
+                  </GridItem>
+                  <GridItem span={6}>
+                    <Title headingLevel="h3" size="md" className="pf-v6-u-mb-sm">
+                      Password
+                    </Title>
+                    <ClipboardCopy
+                      variant={ClipboardCopyVariant.inline}
+                      hoverTip="Copy"
+                      clickTip="Copied!"
+                    >
+                      {user.cluster?.password || user.sharedCluster?.password || 'N/A'}
+                    </ClipboardCopy>
+                  </GridItem>
+                </Grid>
               </CardBody>
             </Card>
-          ) : (
-            <EmptyState
-              variant={EmptyStateVariant.lg}
-            >
-              <Title headingLevel="h2" size="lg">
-                No User Cluster Assigned
-              </Title>
-              <EmptyStateBody>
-                You don't have a cluster assigned yet. Please log in to get assigned a cluster.
-              </EmptyStateBody>
-            </EmptyState>
           )}
-        </PageSection>
 
-        {/* Shared Cluster Section */}
-        <PageSection isFilled>
-          {user.sharedCluster ? (
-            <Card className="cluster-info-card">
-              <CardHeader>
-                <CardTitle>Shared Cluster Info</CardTitle>
-              </CardHeader>
-              <CardBody>
-                <Stack hasGutter>
-                  <StackItem>
-                    <div className="pf-v6-u-text-align-center">
-                      <Title headingLevel="h2" size="lg" className="pf-v6-u-color-100 pf-v6-u-mb-sm">
-                        {user.sharedCluster.name}
+          {/* Clusters Grid - Side by Side */}
+          <Grid hasGutter>
+            {/* User Cluster Section */}
+            <GridItem span={6}>
+              {user.cluster ? (
+                <Card className="cluster-info-card" style={{ height: '100%' }}>
+                  <CardHeader>
+                    <Flex
+                      justifyContent={{ default: 'justifyContentSpaceBetween' }}
+                      alignItems={{ default: 'alignItemsCenter' }}
+                    >
+                      <FlexItem>
+                        <CardTitle>Your User Cluster</CardTitle>
+                      </FlexItem>
+                      <FlexItem>
+                        <Button
+                          variant="danger"
+                          onClick={handleReleaseCluster}
+                          isLoading={isLoading}
+                          size="sm"
+                        >
+                          Release
+                        </Button>
+                      </FlexItem>
+                    </Flex>
+                  </CardHeader>
+                  <CardBody>
+                    <Stack hasGutter>
+                      <StackItem>
+                        <div className="pf-v6-u-text-align-center">
+                          <Title headingLevel="h3" size="lg" className="pf-v6-u-color-100 pf-v6-u-mb-sm">
+                            {user.cluster.name}
+                          </Title>
+                          <p className="pf-v6-u-color-200 pf-v6-u-mb-md pf-v6-u-font-size-sm">
+                            Cluster Console URL
+                          </p>
+                          <ClipboardCopy
+                            variant={ClipboardCopyVariant.inline}
+                            hoverTip="Copy"
+                            clickTip="Copied!"
+                          >
+                            {user.cluster.url}
+                          </ClipboardCopy>
+                        </div>
+                      </StackItem>
+                      
+                      <StackItem>
+                        <Divider />
+                      </StackItem>
+                      
+                      <StackItem>
+                        <Stack hasGutter>
+                          <StackItem>
+                            <Button
+                              component="a"
+                              href={user.cluster.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              variant="secondary"
+                              icon={<ExternalLinkAltIcon />}
+                              iconPosition="right"
+                              isBlock
+                            >
+                              Open User Cluster Console
+                            </Button>
+                          </StackItem>
+                          <StackItem>
+                            <Button
+                              component="a"
+                              href={getVisionUrl(user.cluster.url)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              variant="primary"
+                              icon={<ExternalLinkAltIcon />}
+                              iconPosition="right"
+                              isBlock
+                            >
+                              Open Vision Rules
+                            </Button>
+                          </StackItem>
+                        </Stack>
+                      </StackItem>
+                    </Stack>
+                  </CardBody>
+                </Card>
+              ) : (
+                <Card style={{ height: '100%' }}>
+                  <CardBody>
+                    <EmptyState variant={EmptyStateVariant.sm}>
+                      <Title headingLevel="h3" size="lg">
+                        No User Cluster Assigned
                       </Title>
-                      <p className="pf-v6-u-color-200 pf-v6-u-mb-md">
-                        Shared Cluster Console URL
-                      </p>
-                      <ClipboardCopy
-                        variant={ClipboardCopyVariant.inline}
-                        hoverTip="Copy"
-                        clickTip="Copied!"
-                      >
-                        {user.sharedCluster.url}
-                      </ClipboardCopy>
-                    </div>
-                  </StackItem>
-                  
-                  <StackItem>
-                    <Grid hasGutter>
-                      <GridItem span={6}>
-                          <Title headingLevel="h3" size="md" className="pf-v6-u-mb-sm">
-                            Username
+                      <EmptyStateBody>
+                        You don't have a cluster assigned yet.
+                      </EmptyStateBody>
+                    </EmptyState>
+                  </CardBody>
+                </Card>
+              )}
+            </GridItem>
+
+            {/* Shared Cluster Section */}
+            <GridItem span={6}>
+              {user.sharedCluster ? (
+                <Card className="cluster-info-card" style={{ height: '100%' }}>
+                  <CardHeader>
+                    <CardTitle>Shared Cluster</CardTitle>
+                  </CardHeader>
+                  <CardBody>
+                    <Stack hasGutter>
+                      <StackItem>
+                        <div className="pf-v6-u-text-align-center">
+                          <Title headingLevel="h3" size="lg" className="pf-v6-u-color-100 pf-v6-u-mb-sm">
+                            {user.sharedCluster.name}
                           </Title>
+                          <p className="pf-v6-u-color-200 pf-v6-u-mb-md pf-v6-u-font-size-sm">
+                            Shared Cluster Console URL
+                          </p>
                           <ClipboardCopy
                             variant={ClipboardCopyVariant.inline}
                             hoverTip="Copy"
                             clickTip="Copied!"
                           >
-                            {user.sharedCluster.username}
+                            {user.sharedCluster.url}
                           </ClipboardCopy>
-                      </GridItem>
-                      <GridItem span={6}>
-                          <Title headingLevel="h3" size="md" className="pf-v6-u-mb-sm">
-                            Password
-                          </Title>
-                          <ClipboardCopy
-                            variant={ClipboardCopyVariant.inline}
-                            hoverTip="Copy"
-                            clickTip="Copied!"
-                          >
-                            {user.sharedCluster.password}
-                          </ClipboardCopy>
-                      </GridItem>
-                    </Grid>
-                  </StackItem>
-                  
-                  <StackItem>
-                    <Divider />
-                  </StackItem>
-                  
-                  <StackItem>
-                    <Grid hasGutter>
-                      <GridItem span={6}>
-                        <Button
-                          component="a"
-                          href={user.sharedCluster.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          variant="primary"
-                          icon={<ExternalLinkAltIcon />}
-                          iconPosition="right"
-                          size="lg"
-                          isBlock
-                        >
-                          Open Shared Cluster Console
-                        </Button>
-                      </GridItem>
-                      <GridItem span={6}>
-                        <Button
-                          component="a"
-                          href={getLiteMaasUrl(user.sharedCluster.url)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          variant="secondary"
-                          icon={<ExternalLinkAltIcon />}
-                          iconPosition="right"
-                          size="lg"
-                          isBlock
-                        >
-                          Open LiteMaaS
-                        </Button>
-                      </GridItem>
-                    </Grid>
-                  </StackItem>
-                </Stack>
-              </CardBody>
-            </Card>
-          ) : (
-            <EmptyState
-              variant={EmptyStateVariant.lg}
-            >
-              <Title headingLevel="h2" size="lg">
-                No Shared Cluster Available
-              </Title>
-              <EmptyStateBody>
-                The shared cluster is not configured or available at the moment.
-              </EmptyStateBody>
-            </EmptyState>
-          )}
+                        </div>
+                      </StackItem>
+                      
+                      <StackItem>
+                        <Divider />
+                      </StackItem>
+                      
+                      <StackItem>
+                        <Stack hasGutter>
+                          <StackItem>
+                            <Button
+                              component="a"
+                              href={user.sharedCluster.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              variant="secondary"
+                              icon={<ExternalLinkAltIcon />}
+                              iconPosition="right"
+                              isBlock
+                            >
+                              Open Shared Cluster Console
+                            </Button>
+                          </StackItem>
+                          <StackItem>
+                            <Button
+                              component="a"
+                              href={getLiteMaasUrl(user.sharedCluster.url)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              variant="primary"
+                              icon={<ExternalLinkAltIcon />}
+                              iconPosition="right"
+                              isBlock
+                            >
+                              Open LiteMaaS
+                            </Button>
+                          </StackItem>
+                        </Stack>
+                      </StackItem>
+                    </Stack>
+                  </CardBody>
+                </Card>
+              ) : (
+                <Card style={{ height: '100%' }}>
+                  <CardBody>
+                    <EmptyState variant={EmptyStateVariant.sm}>
+                      <Title headingLevel="h3" size="lg">
+                        No Shared Cluster Available
+                      </Title>
+                      <EmptyStateBody>
+                        The shared cluster is not configured.
+                      </EmptyStateBody>
+                    </EmptyState>
+                  </CardBody>
+                </Card>
+              )}
+            </GridItem>
+          </Grid>
         </PageSection>
       </Page>
     );
