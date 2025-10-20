@@ -239,6 +239,13 @@ class WorkshopDatabase {
     return await this.prisma.sharedCluster.findMany({ orderBy: { id: 'asc' } });
   }
 
+  async findRandomAvailableSharedCluster() {
+    const sharedClusters = await this.prisma.sharedCluster.findMany({ 
+      orderBy: { id: 'asc' }
+    });
+    return sharedClusters[Math.floor(Math.random() * sharedClusters.length)];
+  }
+
   async deleteAllSharedClusters() {
     return await this.prisma.sharedCluster.deleteMany();
   }

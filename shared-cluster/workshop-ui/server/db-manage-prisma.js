@@ -95,7 +95,7 @@ async function showStatus() {
   const workshopUsers = await prisma.workshopUser.findMany({ orderBy: { id: 'asc' } });
   console.log(`Total workshop users: ${workshopUsers.length}`);
   workshopUsers.forEach(user => {
-    console.log(`ID: ${user.id}, Email: ${user.email}, Cluster: ${user.clusterId}, Demo User: ${user.demoUserId}, Created: ${user.createdAt}`);
+    console.log(`ID: ${user.id}, Email: ${user.email}, Cluster: ${user.clusterId}, Demo User: ${user.demoUserId}, Shared Cluster: ${user.sharedClusterId}, Created: ${user.createdAt}`);
   });
 }
 
@@ -233,16 +233,19 @@ async function cleanupAll() {
   const clusterCount = await prisma.cluster.count();
   const demoUserCount = await prisma.demoUser.count();
   const workshopUserCount = await prisma.workshopUser.count();
+  const sharedClusterCount = await prisma.sharedCluster.count();
 
   console.log('Before cleanup:');
   console.log(`  Clusters: ${clusterCount}`);
   console.log(`  Demo users: ${demoUserCount}`);
   console.log(`  Workshop users: ${workshopUserCount}`);
+  console.log(`  Shared clusters: ${sharedClusterCount}`);
 
   // Delete all data
   await prisma.workshopUser.deleteMany();
   await prisma.demoUser.deleteMany();
   await prisma.cluster.deleteMany();
+  await prisma.sharedCluster.deleteMany();
 
   console.log('\nAfter cleanup:');
   console.log('  All data deleted successfully!');
@@ -259,9 +262,11 @@ async function loadFromYaml(yamlFile) {
 
   console.log('Loading all data from YAML file...');
 
-  // Load shared cluster
+  // Load shared clusters (support both single and multiple)
   if (data.shared_cluster) {
     await loadSharedClusterData(data.shared_cluster);
+  } else if (data.shared_clusters && Array.isArray(data.shared_clusters)) {
+    await loadSharedClustersData(data.shared_clusters);
   }
 
   // Load user clusters
@@ -353,6 +358,39 @@ async function loadSharedClusterData(sharedClusterData) {
   });
 
   console.log(`Shared cluster "${name}" added with ID: ${sharedCluster.id}`);
+}
+
+async function loadSharedClustersData(sharedClusters) {
+  let addedCount = 0;
+  let skippedCount = 0;
+
+  for (let i = 0; i < sharedClusters.length; i++) {
+    const sharedClusterData = sharedClusters[i];
+    const { cluster_url, name = `shared-cluster-${i + 1}` } = sharedClusterData;
+    
+    if (!cluster_url) {
+      console.log(`Skipping shared cluster ${i + 1} - missing cluster_url`);
+      skippedCount++;
+      continue;
+    }
+
+    // Check if shared cluster already exists
+    const existingCluster = await prisma.sharedCluster.findUnique({ where: { name } });
+    if (existingCluster) {
+      console.log(`Shared cluster "${name}" already exists, skipping...`);
+      skippedCount++;
+      continue;
+    }
+
+    const sharedCluster = await prisma.sharedCluster.create({
+      data: { name, url: cluster_url }
+    });
+
+    console.log(`Shared cluster "${name}" added with ID: ${sharedCluster.id}`);
+    addedCount++;
+  }
+
+  console.log(`Shared clusters: ${addedCount} added, ${skippedCount} skipped`);
 }
 
 async function loadUserClustersData(userClusters) {

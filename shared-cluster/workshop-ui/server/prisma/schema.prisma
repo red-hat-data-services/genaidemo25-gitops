@@ -42,17 +42,19 @@ model DemoUser {
 }
 
 model WorkshopUser {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
-  passwordHash String
-  clusterId    Int?
-  demoUserId   Int?
-  sessionToken String?
-  createdAt    DateTime @default(now())
-  lastLogin    DateTime?
+  id             Int      @id @default(autoincrement())
+  email          String   @unique
+  passwordHash   String
+  clusterId      Int?
+  demoUserId     Int?
+  sharedClusterId Int?
+  sessionToken   String?
+  createdAt      DateTime @default(now())
+  lastLogin      DateTime?
   
-  cluster   Cluster?  @relation(fields: [clusterId], references: [id])
-  demoUser  DemoUser? @relation(fields: [demoUserId], references: [id])
+  cluster       Cluster?      @relation(fields: [clusterId], references: [id])
+  demoUser      DemoUser?     @relation(fields: [demoUserId], references: [id])
+  sharedCluster SharedCluster? @relation(fields: [sharedClusterId], references: [id])
   
   @@map("workshop_users")
 }
@@ -61,6 +63,8 @@ model SharedCluster {
   id   Int    @id @default(autoincrement())
   name String @unique
   url  String
+  
+  workshopUsers WorkshopUser[]
   
   @@map("shared_clusters")
 }

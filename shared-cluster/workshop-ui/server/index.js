@@ -80,8 +80,9 @@ app.post('/api/auth/login', async (req, res) => {
       if (user.clusterId && user.demoUserId) {
         const cluster = await db.findClusterById(user.clusterId);
         const demoUser = await db.findDemoUserById(user.demoUserId);
+        const sharedCluster = await db.findSharedClusterById(user.sharedClusterId);
         
-        if (cluster && demoUser && cluster.isReserved && demoUser.isReserved) {
+        if (cluster && demoUser && sharedCluster && cluster.isReserved && demoUser.isReserved) {
           // User already has a valid cluster assignment
           const sessionToken = uuidv4();
           await db.updateWorkshopUser(user.id, {
@@ -156,10 +157,21 @@ app.post('/api/auth/login', async (req, res) => {
           continue; // Try next cluster
         }
 
-        // Update workshop user with cluster and demo user assignments
+        // Find a random shared cluster to assign to the user
+        const sharedCluster = await db.findRandomAvailableSharedCluster();
+        
+        if (!sharedCluster) {
+          // Release the cluster and demo user if no shared cluster available
+          await db.releaseCluster(cluster.id);
+          await db.releaseDemoUser(availableDemoUser.id);
+          continue; // Try next cluster
+        }
+
+        // Update workshop user with cluster, demo user, and shared cluster assignments
         await db.updateWorkshopUser(user.id, {
           clusterId: cluster.id,
           demoUserId: availableDemoUser.id,
+          sharedClusterId: sharedCluster.id,
           sessionToken,
           lastLogin: new Date()
         });
@@ -233,14 +245,15 @@ app.get('/api/shared/cluster', authenticateUser, async (req, res) => {
   try {
     const user = req.user;
     
-    if (!user.demoUserId) {
-      return res.status(404).json({ error: 'No demo user assigned' });
+    if (!user.demoUserId || !user.sharedClusterId) {
+      return res.status(404).json({ error: 'No demo user or shared cluster assigned' });
     }
 
-    const sharedClusters = await db.getAllSharedClusters();
+    // Get the user's assigned shared cluster
+    const sharedCluster = await db.findSharedClusterById(user.sharedClusterId);
     
-    if (!sharedClusters || sharedClusters.length === 0) {
-      return res.status(404).json({ error: 'No shared cluster configured' });
+    if (!sharedCluster) {
+      return res.status(404).json({ error: 'Assigned shared cluster not found' });
     }
 
     // Get the user's demo user credentials
@@ -249,9 +262,6 @@ app.get('/api/shared/cluster', authenticateUser, async (req, res) => {
     if (!demoUser) {
       return res.status(404).json({ error: 'Demo user not found' });
     }
-
-    // Return the first shared cluster (there should only be one) with user's credentials
-    const sharedCluster = sharedClusters[0];
     
     res.json({
       cluster: {
