@@ -3,7 +3,9 @@ set -e
 
 # Password will be generated per user as password${i}
 
-echo "Setting up 20 demo users (user1-user20) with passwords password1-password20..."
+DEMO_USER_COUNT=${DEMO_USER_COUNT:-20}
+
+echo "Setting up ${DEMO_USER_COUNT} demo users (user1-user20) with passwords password1-password20..."
 
 # Check if htpasswd secret already exists
 if oc get secret htpass-secret-demo-users -n openshift-config >/dev/null 2>&1; then
@@ -15,7 +17,7 @@ fi
 # Create combined htpasswd file with all demo users
 echo "Creating combined htpasswd file..."
 COMBINED_HTPASSWD=""
-for i in {1..20}; do
+for i in {1..${DEMO_USER_COUNT}}; do
     user_name="user${i}"
     user_password="password${i}"
     echo "Adding ${user_name} to htpasswd file with password ${user_password}..."
@@ -72,8 +74,8 @@ else
 fi
 
 echo ""
-echo "All 20 demo users created successfully!"
-echo "Users: user1, user2, user3, ..., user20"
+echo "All demo users have been set up successfully!"
+echo "Users: user1, user2, user3, ..., user${DEMO_USER_COUNT}"
 echo "Passwords: password1, password2, password3, ..., password20"
 echo "OAuth Identity Provider: demo-user (single entry)"
 echo ""
