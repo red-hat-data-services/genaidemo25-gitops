@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+SCRIPT_DIR=$(dirname ${BASH_SOURCE[0]})
+
 function delete_resources (){
   echo "Deleting all ${1} resources"
   # Check if the api-resource exists
@@ -83,8 +85,6 @@ function delete_webhooks(){
 }
 
 function cleanup_openshift_pipelines() {
-  oc delete -f ./install-pipelines-argocd-app.yaml --ignore-not-found
-
   delete_resources "tektonconfigs.operator.tekton.dev"
   delete_resources "tektoninstallersets.operator.tekton.dev" # Need to delete explicitly despite owned by TektonConfig
                                                              # Otherwise might get stuck on finalizers
@@ -105,8 +105,6 @@ function cleanup_openshift_pipelines() {
 }
 
 function cleanup_web_terminal() {
-  oc delete -f ./install-web-terminal-argocd-app.yaml --ignore-not-found
-
   oc delete ns openshift-terminal --ignore-not-found
 
   delete_resources devworkspaceoperatorconfigs.controller.devfile.io
@@ -128,6 +126,6 @@ function cleanup_web_terminal() {
   delete_marketplace_resources "devworkspace-operator-bundle"
 }
 
-oc delete -f ./lightspeed-applicationset.yaml --ignore-not-found
+oc delete -f $SCRIPT_DIR/lightspeed-argocd-app.yaml --ignore-not-found
 cleanup_openshift_pipelines
 cleanup_web_terminal
