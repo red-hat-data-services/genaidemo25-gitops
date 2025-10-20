@@ -3,38 +3,32 @@ set -e
 
 SCRIPT_DIR=$(dirname ${BASH_SOURCE[0]})
 
+export DEMO_USER_COUNT=${DEMO_USER_COUNT:-20}
+
 $SCRIPT_DIR/setup-demo-users.sh
 
-echo "Checking and assigning cluster-admin privileges to demo users..."
+CLUSTER_ADMINS_GROUP_NAME=demo-users-group-cluster-admins
 
-for i in {1..20}; do
+echo "Generating and creating group $CLUSTER_ADMINS_GROUP_NAME"
+
+for i in $(seq 1 ${DEMO_USER_COUNT}); do
     user_name="user${i}"
-    echo "Checking cluster roles for ${user_name}..."
-
-    # Check if user already has cluster-admin role
-    if oc get clusterrolebinding cluster-admin -o jsonpath='{.subjects[*].name}' | grep -q "^${user_name}$"; then
-        echo "${user_name} already has cluster-admin role"
-    else
-        echo "Assigning cluster-admin role to ${user_name}..."
-        oc adm policy add-cluster-role-to-user cluster-admin ${user_name}
-    fi
-
-    # Check if user already has view role
-    if oc get clusterrolebinding view -o jsonpath='{.subjects[*].name}' | grep -q "^${user_name}$"; then
-        echo "${user_name} already has view role"
-    else
-        echo "Assigning view role to ${user_name}..."
-        oc adm policy add-cluster-role-to-user view ${user_name}
-    fi
-
-    # Check if user already has self-provisioner role
-    if oc get clusterrolebinding self-provisioner -o jsonpath='{.subjects[*].name}' | grep -q "^${user_name}$"; then
-        echo "${user_name} already has self-provisioner role"
-    else
-        echo "Assigning self-provisioner role to ${user_name}..."
-        oc adm policy add-cluster-role-to-user self-provisioner ${user_name}
-    fi
+    user_list=$user_list'  '"- $user_name"$'\n'
 done
 
+oc apply -f - <<EOF
+kind: Group
+apiVersion: user.openshift.io/v1
+metadata:
+  name: demo-users-group-cluster-admins
+users:
+$user_list
+EOF
+
+oc adm policy add-cluster-role-to-group cluster-admin $CLUSTER_ADMINS_GROUP_NAME
+oc adm policy add-cluster-role-to-group view $CLUSTER_ADMINS_GROUP_NAME
+oc adm policy add-cluster-role-to-group self-provisioner $CLUSTER_ADMINS_GROUP_NAME
+
+
 echo ""
-echo "All 20 demo users have been assigned cluster-admin privileges!"
+echo "All $DEMO_USER_COUNT demo users have been assigned cluster-admin privileges!"
