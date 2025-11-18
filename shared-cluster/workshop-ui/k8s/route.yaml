@@ -1,0 +1,32 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: workshop-client
+  labels:
+    app: workshop-client
+spec:
+  to:
+    kind: Service
+    name: workshop-client
+  port:
+    targetPort: 3000
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: workshop-server
+  labels:
+    app: workshop-server
+spec:
+  to:
+    kind: Service
+    name: workshop-server
+  port:
+    targetPort: 3001
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+

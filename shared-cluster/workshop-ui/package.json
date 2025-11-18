@@ -1,0 +1,40 @@
+{
+  "name": "workshop-ui",
+  "version": "1.0.0",
+  "description": "Workshop UI - Cluster Management System with React and Node.js",
+  "scripts": {
+    "dev": "mkdir -p server/data && podman-compose up --build -d",
+    "dev:client": "mkdir -p server/data && podman-compose up --build -d workshop-client",
+    "dev:local": "concurrently \"npm run dev:server\" \"npm run dev:client-local\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client-local": "cd client && npm start",
+    "dev:logs": "podman-compose logs -f",
+    "dev:stop": "podman-compose down",
+    "dev:restart": "podman-compose restart",
+    "dev:clean": "podman-compose down -v && podman system prune -f",
+    "build": "cd server && npm install && cd ../client && npm install",
+    "build:server": "podman build -t workshop-server:latest ./server",
+    "build:client": "podman build -t workshop-client:latest ./client",
+    "build:all": "npm run build:server && npm run build:client",
+    "start": "podman-compose up -d",
+    "stop": "podman-compose down",
+    "logs": "podman-compose logs -f",
+    "deploy:dev": "./deploy.sh workshop-ui-dev development",
+    "deploy:prod": "./deploy.sh workshop-ui-prod production",
+    "clean": "podman-compose down -v && podman system prune -f"
+  },
+  "keywords": [
+    "workshop",
+    "kubernetes",
+    "cluster",
+    "management",
+    "react",
+    "nodejs",
+    "patternfly"
+  ],
+  "author": "Workshop Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
