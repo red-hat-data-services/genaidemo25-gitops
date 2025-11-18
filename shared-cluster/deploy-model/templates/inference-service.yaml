@@ -10,6 +10,9 @@ metadata:
     serving.kserve.io/deploymentMode: Serverless
     sidecar.istio.io/inject: "true"
     sidecar.istio.io/rewriteAppHTTPProbers: "true"
+    {{- if .Values.inference.timeoutSeconds }}
+    serving.knative.dev/timeout-seconds: {{ .Values.inference.timeoutSeconds | quote }}
+    {{- end }}
   labels:
     opendatahub.io/dashboard: "true"
 spec:

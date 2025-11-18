@@ -1,0 +1,35 @@
+{{- if hasPrefix "hf://" .Values.model.sourceUri }}
+# ClusterStorageContainer for Hugging Face model downloads
+apiVersion: serving.kserve.io/v1alpha1
+kind: ClusterStorageContainer
+metadata:
+  name: {{ .Values.model.name }}-storage
+spec:
+  container:
+    name: storage-initializer
+    env:
+      - name: HUGGINGFACE_HUB_CACHE
+        value: /mnt/models
+      - name: HF_HOME
+        value: /tmp/hf_home
+      {{- if .Values.huggingface.tokenSecret }}
+      - name: HF_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: {{ .Values.huggingface.tokenSecret }}
+            key: token
+      {{- end }}
+    resources:
+      limits:
+        memory: 8Gi
+  supportedUriFormats:
+    - prefix: hf://
+    - prefix: gs://
+    - prefix: s3://
+    - prefix: hdfs://
+    - prefix: webhdfs://
+    - regex: "https://(.+?).blob.core.windows.net/(.+)"
+    - regex: "https://(.+?).file.core.windows.net/(.+)"
+    - regex: "https?://(.+)/(.+)"
+{{- end }}
+

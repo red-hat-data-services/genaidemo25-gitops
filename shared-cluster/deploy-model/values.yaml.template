@@ -8,6 +8,7 @@ model:
   #   - OCI:  oci://<YOUR_MODELCAR_MODEL_URI>
   #   - HTTP: https://<bucket-or-endpoint>/<path-to-model>
   #   - S3:   s3://<bucket>/<path-to-model>
+  #   - HF:   hf://<huggingface-org>/<model-name> (creates ClusterStorageContainer)
   sourceUri: "oci://<YOUR_MODELCAR_MODEL_URI>"
   # Model format for KServe
   format: "vLLM"
@@ -47,6 +48,9 @@ inference:
   name: "model-inference-service"
   # Display name for the inference service
   displayName: "Model Inference Service"
+  # Timeout in seconds for the inference service (optional)
+  # Useful for large model downloads from Hugging Face (default: 300 seconds)
+  # timeoutSeconds: 1800
   # Autoscaling configuration
   scaling:
     minReplicas: 1
@@ -69,3 +73,10 @@ inference:
   # Container registry secret (optional). Leave unset when using HTTPS/S3 model URIs.
 connection:
   name: ""
+
+# Hugging Face configuration (only used when model.sourceUri starts with hf://)
+huggingface:
+  # Name of the secret containing the HF_TOKEN (optional)
+  # Required for private or gated models on Hugging Face
+  # The secret must have a key named "token"
+  tokenSecret: ""

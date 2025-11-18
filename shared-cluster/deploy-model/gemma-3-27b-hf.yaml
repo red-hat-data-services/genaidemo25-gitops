@@ -1,0 +1,73 @@
+# Model deployment configuration for Hugging Face
+model:
+  # Model identifier - used for naming resources
+  name: "gemma-3-27b-hf"
+  # Display name for the model
+  displayName: "Gemma 3 27B (Hugging Face)"
+  # Model source URI from Hugging Face
+  sourceUri: "hf://google/gemma-3-27b-it"
+  # Model format for KServe
+  format: "vLLM"
+
+# Namespace configuration
+namespace:
+  # Name of the namespace to deploy into
+  name: "genai25-deployments"
+
+# Serving runtime configuration
+runtime:
+  # Name of the serving runtime
+  name: "vllm-cuda-runtime-gemma-hf"
+  # Display name for the runtime
+  displayName: "RH OpenShift AI 2.24 vLLM"
+  # Runtime image
+  image: "quay.io/modh/vllm@sha256:b2391f71951de276722ee5c91a92da4537da36297c9b9d1f2a67ecbaee0214eb"
+  # Runtime annotations
+  annotations:
+    acceleratorName: "nvidia-gpu"
+    apiProtocol: "REST"
+    hardwareProfileName: ""
+    recommendedAccelerators: '["nvidia.com/gpu"]'
+    runtimeVersion: "v0.10.0"
+    servingRuntimeScope: "global"
+    templateDisplayName: "RH OpenShift AI 2.24vLLM"
+    templateName: "vllm-cuda-runtime-gemma-hf"
+  # extraArgs:
+  #   - --gpu_memory_utilization=0.95
+
+# Inference service configuration
+inference:
+  # Name of the inference service
+  name: "gemma-hf-model-service"
+  # Display name for the inference service
+  displayName: "Gemma 3 27B Hugging Face Model Service"
+  # Timeout in seconds for large model downloads
+  timeoutSeconds: 1800
+  # Autoscaling configuration
+  scaling:
+    minReplicas: 1
+    maxReplicas: 1
+  # Resource requirements
+  resources:
+    requests:
+      cpu: "4"
+      memory: "16Gi"
+      gpu: "1"
+    limits:
+      cpu: "8"
+      memory: "20Gi"
+      gpu: "1"
+  # GPU tolerations
+  tolerations:
+    - effect: NoSchedule
+      key: nvidia.com/gpu
+      operator: Exists
+
+connection:
+  name: ""
+
+# Hugging Face configuration
+huggingface:
+  # Name of the secret containing the HF_TOKEN (optional)
+  # Leave empty for public models, set for private/gated models
+  tokenSecret: "huggingface-token"
