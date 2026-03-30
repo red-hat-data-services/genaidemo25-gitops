@@ -10,20 +10,27 @@ metadata:
 spec:
   project: default
   sources:
-    - repoURL: https://github.com/red-hat-data-services/genaidemo25-gitops.git
-      targetRevision: main
+    - repoURL: https://github.com/kpiwko/genaidemo25-gitops.git
+      targetRevision: hs-hackathon
       path: shared-cluster/deploy-model
       helm:
         releaseName: gpt-oss-20b
         valueFiles:
           - "gpt-oss-20b.yaml"
-    - repoURL: https://github.com/red-hat-data-services/genaidemo25-gitops.git
-      targetRevision: main
+    - repoURL: https://github.com/kpiwko/genaidemo25-gitops.git
+      targetRevision: hs-hackathon
       path: shared-cluster/deploy-model
       helm:
         releaseName: gemma-3-27b
         valueFiles:
           - "gemma-3-27b.yaml"
+    - repoURL: https://github.com/kpiwko/genaidemo25-gitops.git
+      targetRevision: hs-hackathon
+      path: shared-cluster/deploy-model
+      helm:
+        releaseName: qwen35-35b-a3b
+        valueFiles:
+          - "qwen35-35b-a3b.yaml"
   destination:
     server: "https://kubernetes.default.svc"
     namespace: "genai25-deployments"

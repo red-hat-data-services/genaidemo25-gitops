@@ -1,28 +1,39 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: module-lightspeed
+  name: hsworkshop
   namespace: openshift-gitops
+  labels:
+    app.kubernetes.io/managed-by: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   sources:
+    # OpenWebUI, Langfuse, PostgreSQL, TrustyAI guardrails
     - repoURL: https://github.com/kpiwko/genaidemo25-gitops.git
       targetRevision: hs-hackathon
-      path: module-lightspeed/install-pipelines
+      path: module-hsworkshop/install
+    # EuroLLM 22B Instruct FP8 model
     - repoURL: https://github.com/kpiwko/genaidemo25-gitops.git
       targetRevision: hs-hackathon
-      path: module-lightspeed/install-web-terminal
+      path: shared-cluster/deploy-model
+      helm:
+        releaseName: eurollm-22b-hsworkshop
+        valueFiles:
+          - "eurollm-22b-instruct-fp8-hsworkshop.yaml"
   destination:
     server: https://kubernetes.default.svc
-    namespace: openshift-operators
+    namespace: hsworkshop
   syncPolicy:
+    managedNamespaceMetadata:
+      labels:
+        argocd.argoproj.io/managed-by: openshift-gitops
     automated:
-      prune: true
-      selfHeal: true
+      prune: false
+      selfHeal: false
     syncOptions:
+      - CreateNamespace=true
       - PrunePropagationPolicy=foreground
       - PruneLast=true
-      - RespectIgnoreDifferences=true
   revisionHistoryLimit: 3

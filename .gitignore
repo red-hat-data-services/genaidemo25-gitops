@@ -12,3 +12,4 @@ shared-cluster/deploy-model/values.yaml
 # Temporary files
 *.tmp
 *.bak
+
