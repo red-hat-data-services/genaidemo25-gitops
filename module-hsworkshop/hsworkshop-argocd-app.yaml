@@ -11,12 +11,12 @@ spec:
   project: default
   sources:
     # OpenWebUI, Langfuse, PostgreSQL, TrustyAI guardrails
-    - repoURL: https://github.com/kpiwko/genaidemo25-gitops.git
-      targetRevision: hs-hackathon
+    - repoURL: https://github.com/red-hat-data-services/genaidemo25-gitops.git
+      targetRevision: HEAD
       path: module-hsworkshop/install
     # EuroLLM 22B Instruct FP8 model
-    - repoURL: https://github.com/kpiwko/genaidemo25-gitops.git
-      targetRevision: hs-hackathon
+    - repoURL: https://github.com/red-hat-data-services/genaidemo25-gitops.git
+      targetRevision: HEAD
       path: shared-cluster/deploy-model
       helm:
         releaseName: eurollm-22b-hsworkshop
