@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yaml
+  - rbac.yaml
+  - postgres.yaml
+  - redis.yaml
+  - clickhouse.yaml
+  - minio.yaml
+  - langfuse.yaml
+  - pipelines.yaml
+  - searxng.yaml
+  - profanity-detector.yaml
+  - openwebui.yaml
+  - guardrails.yaml
+  - insights.yaml
+  - eurollm-chat-template.yaml

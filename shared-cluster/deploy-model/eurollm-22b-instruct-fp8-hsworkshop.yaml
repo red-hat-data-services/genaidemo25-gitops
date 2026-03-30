@@ -1,0 +1,71 @@
+model:
+  name: "eurollm-22b-instruct-fp8"
+  displayName: "EuroLLM 22B Instruct FP8"
+  sourceUri: "oci://quay.io/dprod/eurollm-22b-instruct-fp8-modelcar:latest"
+  format: "vLLM"
+
+namespace:
+  name: "hsworkshop"
+
+runtime:
+  name: "vllm-cuda-runtime-eurollm-22b-hs"
+  displayName: "EuroLLM 22B Instruct FP8 vLLM Runtime"
+  # Use upstream vLLM v0.18.0 for FP8 compressed-tensors support.
+  # tokenizer_config.json says LlamaTokenizer (needs tokenizer.model/SentencePiece)
+  # but the OCI image layers are read-only. preStartScript copies tokenizer files to
+  # /tmp, patches tokenizer_class to PreTrainedTokenizerFast, then vLLM uses --tokenizer
+  # pointing to the patched copy. VLLM_USE_V1=0 bypasses the renderers module entirely.
+  image: "docker.io/vllm/vllm-openai:latest"
+  extraEnv:
+    VLLM_USE_V1: "0"
+  preStartScript: |
+    while [ ! -f /mnt/models/tokenizer.json ]; do sleep 0.2; done
+    mkdir -p /tmp/tokenizer_patched
+    for f in tokenizer_config.json tokenizer.json special_tokens_map.json; do
+      [ -f "/mnt/models/$f" ] && cp "/mnt/models/$f" /tmp/tokenizer_patched/
+    done
+    python3 -c 'import json; p="/tmp/tokenizer_patched/tokenizer_config.json"; d=json.load(open(p)); d["tokenizer_class"]="PreTrainedTokenizerFast"; json.dump(d,open(p,"w")); print("Tokenizer class patched",flush=True)'
+  annotations:
+    acceleratorName: "nvidia-gpu"
+    apiProtocol: "REST"
+    hardwareProfileName: ""
+    recommendedAccelerators: '["nvidia.com/gpu"]'
+    runtimeVersion: "latest"
+    servingRuntimeScope: "global"
+    templateDisplayName: "EuroLLM 22B Instruct FP8 vLLM Runtime"
+    templateName: "vllm-cuda-runtime-eurollm-22b-hs"
+  extraArgs:
+    - --gpu-memory-utilization=0.95
+    - --max-model-len=32768
+    - --tokenizer=/tmp/tokenizer_patched
+    - --chat-template=/etc/vllm/chat-template.jinja
+  extraVolumes:
+    - name: chat-template
+      configMap:
+        name: eurollm-chat-template
+  extraVolumeMounts:
+    - name: chat-template
+      mountPath: /etc/vllm
+
+inference:
+  name: "eurollm-22b-service"
+  displayName: "EuroLLM 22B Instruct FP8 Service"
+  scaling:
+    minReplicas: 1
+    maxReplicas: 1
+  resources:
+    requests:
+      cpu: "4"
+      memory: "40Gi"
+      gpu: "1"
+    limits:
+      cpu: "8"
+      memory: "60Gi"
+      gpu: "1"
+  tolerations:
+    - effect: NoSchedule
+      key: nvidia.com/gpu
+      operator: Exists
+
+connection:
+  name: ""
