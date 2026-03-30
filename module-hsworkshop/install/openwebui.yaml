@@ -1,0 +1,116 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: openwebui-data
+  namespace: hsworkshop
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openwebui
+  namespace: hsworkshop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openwebui
+  template:
+    metadata:
+      labels:
+        app: openwebui
+    spec:
+      serviceAccountName: hsworkshop-anyuid
+      containers:
+        - name: openwebui
+          image: ghcr.io/open-webui/open-webui:latest
+          ports:
+            - containerPort: 8080
+          env:
+            # Model backend - GPT-OSS 20B InferenceService via internal cluster service
+            # RawDeployment mode exposes via ClusterIP service, not a Route
+            - name: OPENAI_API_BASE_URL
+              # Route through guardrails-proxy which enforces TrustyAI profanity detection on chat completions
+              # while passing model listing and other endpoints directly to the predictor
+              value: "http://guardrails-proxy.hsworkshop.svc.cluster.local:8080/v1"
+            - name: OPENAI_API_KEY
+              value: "unused"
+            # Langfuse tracing - keys populated after first Langfuse deploy
+            - name: LANGFUSE_HOST
+              value: "http://langfuse:3000"
+            - name: ENABLE_OPENAI_API
+              value: "true"
+            - name: WEBUI_NAME
+              value: "HS Workshop AI"
+            # Disable Ollama since we use OpenAI-compatible endpoint only
+            - name: ENABLE_OLLAMA_API
+              value: "false"
+            - name: ENABLE_EVALUATION_ARENA_MODELS
+              value: "false"
+            # Web search via self-hosted SearXNG
+            - name: ENABLE_RAG_WEB_SEARCH
+              value: "true"
+            - name: RAG_WEB_SEARCH_ENGINE
+              value: "searxng"
+            - name: SEARXNG_QUERY_URL
+              value: "http://searxng:8080/search?q=<query>&format=json"
+            - name: ENABLE_SIGNUP
+              value: "true"
+            - name: DEFAULT_USER_ROLE
+              value: "user"
+          envFrom:
+            - secretRef:
+                name: openwebui-secret
+          volumeMounts:
+            - name: data
+              mountPath: /app/backend/data
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "2"
+              memory: "2Gi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: openwebui-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openwebui
+  namespace: hsworkshop
+spec:
+  selector:
+    app: openwebui
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: openwebui
+  namespace: hsworkshop
+spec:
+  host: openwebui-hsworkshop.apps.brno-hack-pool-s5z4r.aws.rh-ods.com
+  to:
+    kind: Service
+    name: openwebui
+  port:
+    targetPort: 8080
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
