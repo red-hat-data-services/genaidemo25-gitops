@@ -1,0 +1,21 @@
+# TrustyAI GuardrailsOrchestrator
+#
+# Sits between OpenWebUI and the InferenceService. After deploying:
+# 1. The orchestrator exposes a gateway at port 8080
+# 2. OpenWebUI uses guardrails-proxy (nginx) which routes chat completions through
+#    the TrustyAI gateway (:8090/all/v1/chat/completions) and model listing directly
+#    to the predictor. See module-hsworkshop/install/profanity-detector.yaml.
+# 3. All prompts flow through TrustyAI before reaching eurollm-22b-service
+#    Blocked prompts are logged by Langfuse (OpenWebUI logs the error response)
+apiVersion: trustyai.opendatahub.io/v1alpha1
+kind: GuardrailsOrchestrator
+metadata:
+  name: guardrails-orchestrator
+  namespace: hsworkshop
+spec:
+  autoConfig:
+    inferenceServiceToGuardrail: eurollm-22b-service
+    detectorServiceLabelToMatch: trustyai/guardrails-groupA
+  enableBuiltInDetectors: true
+  enableGuardrailsGateway: true
+  replicas: 1
